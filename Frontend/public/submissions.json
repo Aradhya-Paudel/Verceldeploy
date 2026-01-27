@@ -1,3 +1,60 @@
 {
-  "submissions": []
+  "submissions": [
+    {
+      "id": "SUB-1704067200000",
+      "title": "Road Accident - Car Collision",
+      "image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwwDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAr/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8VAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA/9k=",
+      "severity": "high",
+      "location": "Kathmandu - Thamel District",
+      "latitude": 28.210903,
+      "longitude": 83.977384,
+      "accuracy": 15.5,
+      "time": "2 mins ago",
+      "status": "ACTIVE",
+      "timestamp": "2026-01-27T10:30:00Z",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2_1 like Mac OS X)"
+    },
+    {
+      "id": "SUB-1704066900000",
+      "title": "Building Fire - Medical Emergency",
+      "image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwwDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAr/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8VAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA/9k=",
+      "severity": "high",
+      "location": "Kathmandu - Durbar Square",
+      "latitude": 28.20938,
+      "longitude": 83.98145,
+      "accuracy": 22.3,
+      "time": "5 mins ago",
+      "status": "RESPONDING",
+      "timestamp": "2026-01-27T10:27:00Z",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2_1 like Mac OS X)"
+    },
+    {
+      "id": "SUB-1704066600000",
+      "title": "Person Injured - Fall from Height",
+      "image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwwDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAr/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8VAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA/9k=",
+      "severity": "medium",
+      "location": "Kathmandu - Pashupatinath Temple",
+      "latitude": 28.213785,
+      "longitude": 83.987923,
+      "accuracy": 18.7,
+      "time": "8 mins ago",
+      "status": "RESOLVED",
+      "timestamp": "2026-01-27T10:24:00Z",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2_1 like Mac OS X)"
+    },
+    {
+      "id": "SUB-1704066300000",
+      "title": "Heart Attack - Requires CPR",
+      "image": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwwDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAr/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8VAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwAA/9k=",
+      "severity": "high",
+      "location": "Kathmandu - Patan Hospital Area",
+      "latitude": 28.20565,
+      "longitude": 83.97321,
+      "accuracy": 12.1,
+      "time": "12 mins ago",
+      "status": "RESPONDING",
+      "timestamp": "2026-01-27T10:20:00Z",
+      "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_2_1 like Mac OS X)"
+    }
+  ]
 }

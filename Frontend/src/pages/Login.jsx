@@ -1,16 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const currentDate = new Date().getFullYear();
 
 function Login() {
   const navigate = useNavigate();
-  const [user, setUser] = useState();
-  const [password, setPassword] = useState();
+  const [user, setUser] = useState("");
+  const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // Redirect if already logged in
+  useEffect(() => {
+    const isAuth = localStorage.getItem("adminAuth");
+    const userType = localStorage.getItem("userType");
+
+    if (isAuth === "true" && userType) {
+      if (userType === "hospital") {
+        navigate("/hospital", { replace: true });
+      } else if (userType === "ambulance") {
+        navigate("/ambulance", { replace: true });
+      }
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setError(""); // Clear error on input change
     if (name === "user") {
       setUser(value);
     } else if (name === "password") {
@@ -20,6 +37,19 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
+    // Input validation
+    if (!user.trim()) {
+      setError("Please enter your username.");
+      return;
+    }
+    if (!password.trim()) {
+      setError("Please enter your password.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       // Fetch hospitals data
@@ -34,39 +64,38 @@ function Login() {
 
       // Check hospitals
       const hospital = hospitalsData.hospitals.find(
-        (h) => h.name === user && h.password === password,
+        (h) => h.name === user.trim() && h.password === password,
       );
       if (hospital) {
         localStorage.setItem("adminAuth", "true");
         localStorage.setItem("userType", "hospital");
         localStorage.setItem("userName", hospital.name);
-        navigate("/hospital");
-        setUser("");
-        setPassword("");
+        navigate("/hospital", { replace: true });
         return;
       }
 
       // Check ambulances
       const ambulance = ambulancesData.ambulances.find(
-        (a) => a.name === user && a.password === password,
+        (a) => a.name === user.trim() && a.password === password,
       );
       if (ambulance) {
         localStorage.setItem("adminAuth", "true");
         localStorage.setItem("userType", "ambulance");
         localStorage.setItem("userName", ambulance.name);
-        navigate("/ambulance");
-        setUser("");
-        setPassword("");
+        navigate("/ambulance", { replace: true });
         return;
       }
 
       // No match found
-      alert("Invalid credentials. Please try again.");
-      setUser("");
+      setError("Invalid username or password. Please try again.");
       setPassword("");
-    } catch (error) {
-      alert("Error loading credentials. Please try again.");
-      console.error(error);
+    } catch (err) {
+      setError(
+        "Unable to connect. Please check your connection and try again.",
+      );
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -100,6 +129,15 @@ function Login() {
               </p>
             </div>
             <form className="space-y-5" onSubmit={handleSubmit}>
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-red-600 text-lg">
+                    error
+                  </span>
+                  <p className="text-red-700 text-sm font-medium">{error}</p>
+                </div>
+              )}
               <div className="flex flex-col gap-1.5">
                 <label className="text-primary text-sm font-semibold px-1">
                   Username
@@ -112,7 +150,8 @@ function Login() {
                     name="user"
                     value={user}
                     onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-3.5 bg-accent/10 border border-accent/30 rounded-lg text-primary placeholder:text-primary/40 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    disabled={loading}
+                    className="w-full pl-11 pr-4 py-3.5 bg-accent/10 border border-accent/30 rounded-lg text-primary placeholder:text-primary/40 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     type="text"
                   />
                 </div>
@@ -128,12 +167,13 @@ function Login() {
                     vpn_key
                   </span>
                   <input
-                    className="w-full pl-11 pr-12 py-3.5 bg-accent/10 border border-accent/30 rounded-lg text-primary placeholder:text-primary/40 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    className="w-full pl-11 pr-12 py-3.5 bg-accent/10 border border-accent/30 rounded-lg text-primary placeholder:text-primary/40 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     placeholder="••••••••••••"
                     type={passwordVisible ? "text" : "password"}
                     name="password"
                     value={password}
                     onChange={handleChange}
+                    disabled={loading}
                   />
                   <button
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-primary/50 hover:text-primary flex items-center"
@@ -147,11 +187,23 @@ function Login() {
                 </div>
               </div>
               <button
-                className="w-full py-4 bg-primary hover:bg-primary/90 text-white rounded-lg font-bold text-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 mt-2"
+                className="w-full py-4 bg-primary hover:bg-primary/90 disabled:bg-primary/50 disabled:cursor-not-allowed text-white rounded-lg font-bold text-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 mt-2"
                 type="submit"
+                disabled={loading}
               >
-                <span>Login</span>
-                <span className="material-symbols-outlined">login</span>
+                {loading ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin">
+                      progress_activity
+                    </span>
+                    <span>Signing in...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Login</span>
+                    <span className="material-symbols-outlined">login</span>
+                  </>
+                )}
               </button>
             </form>
             <div className="mt-8 pt-6 border-t border-gray-100 flex flex-col items-center gap-4 text-center">

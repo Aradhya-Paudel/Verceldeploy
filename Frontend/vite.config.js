@@ -7,6 +7,6 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     host: true, // Expose to network
-    https: true, // Enable HTTPS with auto-generated certificate
+
   },
 });

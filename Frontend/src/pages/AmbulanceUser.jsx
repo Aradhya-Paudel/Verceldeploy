@@ -18,10 +18,10 @@ function AmbulanceUser() {
 
     setUser(userName);
 
-    // Fetch active incidents
-    fetch("/active-incidents.json")
+    // Fetch submissions data instead of active incidents
+    fetch("/submissions.json")
       .then((res) => res.json())
-      .then((data) => setIncidents(data.incidents))
+      .then((data) => setIncidents(data.submissions))
       .catch((error) => console.error("Error loading incidents:", error));
   }, [navigate]);
 

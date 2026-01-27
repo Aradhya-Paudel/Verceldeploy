@@ -21,51 +21,52 @@ function GuestUser() {
   // Check if we're in a secure context (required for camera/location)
   const isSecureContext = window.isSecureContext;
 
+  const startCameraStream = async () => {
+    // Check if secure context
+    if (!isSecureContext) {
+      setError(
+        "Camera requires HTTPS. Please access this site via HTTPS or localhost.",
+      );
+      return;
+    }
+
+    // Check if mediaDevices API is available
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setError(
+        "Camera API not supported in this browser. Please use a modern browser.",
+      );
+      return;
+    }
+
+    try {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+      });
+      setStream(mediaStream);
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+      }
+      setError(null);
+    } catch (err) {
+      console.error("Error accessing camera:", err);
+      if (err.name === "NotAllowedError") {
+        setError(
+          "Camera access denied. Please enable camera permissions in your browser settings.",
+        );
+      } else if (err.name === "NotFoundError") {
+        setError("No camera found on this device.");
+      } else if (err.name === "NotReadableError") {
+        setError("Camera is already in use by another application.");
+      } else if (err.name === "OverconstrainedError") {
+        setError("Camera constraints could not be satisfied.");
+      } else {
+        setError(`Camera error: ${err.message}`);
+      }
+    }
+  };
+
   useEffect(() => {
-    const startCamera = async () => {
-      // Check if secure context
-      if (!isSecureContext) {
-        setError(
-          "Camera requires HTTPS. Please access this site via HTTPS or localhost.",
-        );
-        return;
-      }
-
-      // Check if mediaDevices API is available
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setError(
-          "Camera API not supported in this browser. Please use a modern browser.",
-        );
-        return;
-      }
-
-      try {
-        const mediaStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment" },
-        });
-        setStream(mediaStream);
-        if (videoRef.current) {
-          videoRef.current.srcObject = mediaStream;
-        }
-      } catch (err) {
-        console.error("Error accessing camera:", err);
-        if (err.name === "NotAllowedError") {
-          setError(
-            "Camera access denied. Please enable camera permissions in your browser settings.",
-          );
-        } else if (err.name === "NotFoundError") {
-          setError("No camera found on this device.");
-        } else if (err.name === "NotReadableError") {
-          setError("Camera is already in use by another application.");
-        } else if (err.name === "OverconstrainedError") {
-          setError("Camera constraints could not be satisfied.");
-        } else {
-          setError(`Camera error: ${err.message}`);
-        }
-      }
-    };
-
-    startCamera();
+    startCameraStream();
 
     return () => {
       if (stream) {
@@ -183,6 +184,7 @@ function GuestUser() {
     setCapturedImage(null);
     setLocation(null);
     setError(null);
+    startCameraStream();
   };
 
   return (
@@ -250,6 +252,7 @@ function GuestUser() {
                   ref={videoRef}
                   autoPlay
                   playsInline
+                  muted
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 border-4 border-primary/30 pointer-events-none" />

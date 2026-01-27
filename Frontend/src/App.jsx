@@ -17,7 +17,7 @@ const router = createBrowserRouter([
   {
     path: "/ambulance",
     element: (
-      <IsAuthenticated>
+      <IsAuthenticated allowedRoles={["ambulance"]}>
         <AmbulanceUser />
       </IsAuthenticated>
     ),
@@ -25,7 +25,7 @@ const router = createBrowserRouter([
   {
     path: "/hospital",
     element: (
-      <IsAuthenticated>
+      <IsAuthenticated allowedRoles={["hospital"]}>
         <HospitalDashboard />
       </IsAuthenticated>
     ),
@@ -33,7 +33,7 @@ const router = createBrowserRouter([
   {
     path: "/hospital/inventory",
     element: (
-      <IsAuthenticated>
+      <IsAuthenticated allowedRoles={["hospital"]}>
         <HospitalInventory />
       </IsAuthenticated>
     ),
@@ -41,7 +41,7 @@ const router = createBrowserRouter([
   {
     path: "/hospital/staff",
     element: (
-      <IsAuthenticated>
+      <IsAuthenticated allowedRoles={["hospital"]}>
         <HospitalStaff />
       </IsAuthenticated>
     ),
@@ -49,7 +49,7 @@ const router = createBrowserRouter([
   {
     path: "/hospital/fleet",
     element: (
-      <IsAuthenticated>
+      <IsAuthenticated allowedRoles={["hospital"]}>
         <HospitalFleet />
       </IsAuthenticated>
     ),
