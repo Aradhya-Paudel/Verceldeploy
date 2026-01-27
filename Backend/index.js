@@ -6,6 +6,11 @@ const supabase = require('./supabaseClient');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Startup Validation
+if (!process.env.LOCATIONIQ_API_KEY) {
+    console.warn('\n⚠️  WARNING: LocationIQ API key not configured. Map features will be disabled.\n');
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -28,13 +33,40 @@ app.get('/health', async (req, res) => {
     }
 });
 
+<<<<<<< HEAD
+=======
+// Routes
+app.use('/api', require('./routes/match'));
+app.use('/api', require('./routes/map'));
+app.use('/api', require('./routes/hospital'));
+
+// Summary Endpoint (Legacy support if needed, but sticking to new routes)
+app.get('/api/hospitals', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('hospitals_summary').select('*');
+        if (error) throw error;
+        res.json(data);
+    } catch (err) {
+        console.error('Error fetching hospitals:', err.message);
+        res.status(500).json({ error: 'Failed to fetch hospitals' });
+    }
+});
+
+>>>>>>> f12f936 (Auto-sync on project open)
 // Root Route
 app.get('/', (req, res) => {
     res.json({
         message: 'Hospital Resource Backend is Running',
         endpoints: {
             health: '/health',
+<<<<<<< HEAD
             match: '/api/match'
+=======
+            hospitals: '/api/hospitals',
+            hospitalsMap: '/api/hospitals/map',
+            match: '/api/match',
+            geocode: '/api/geocode'
+>>>>>>> f12f936 (Auto-sync on project open)
         }
     });
 });
