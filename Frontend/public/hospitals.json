@@ -1,0 +1,527 @@
+{
+  "hospitals": [
+    {
+      "id": 1,
+      "name": "Central Medical Center",
+      "password": "hospital123",
+      "email": "admin@centralmed.com",
+      "phone": "+1-555-0101",
+      "address": "123 Medical Plaza, Healthcare City, HC 12345",
+      "ambulanceCount": 12,
+      "staffCount": {
+        "Trauma Surgery": 45,
+        "Cardiology": 42,
+        "Neurology": 38,
+        "Orthopedics": 35,
+        "Oncology": 40,
+        "Gastroenterology": 36,
+        "Pediatrics": 34,
+        "Psychiatry": 32,
+        "Dermatology": 28,
+        "Respiratory": 37,
+        "Urology": 30,
+        "Rheumatology": 25
+      },
+      "bedsAvailable": 50,
+      "bloodInventory": {
+        "total": 1280,
+        "bloodTypes": [
+          {
+            "type": "A+",
+            "liters": 450
+          },
+          {
+            "type": "A-",
+            "liters": 45
+          },
+          {
+            "type": "B+",
+            "liters": 320
+          },
+          {
+            "type": "B-",
+            "liters": 84
+          },
+          {
+            "type": "O+",
+            "liters": 560
+          },
+          {
+            "type": "O-",
+            "liters": 12
+          },
+          {
+            "type": "AB+",
+            "liters": 192
+          },
+          {
+            "type": "AB-",
+            "liters": 65
+          }
+        ]
+      },
+      "specialties": {
+        "active": 12,
+        "list": [
+          "Trauma Surgery",
+          "Cardiology",
+          "Neurology",
+          "Orthopedics",
+          "Oncology",
+          "Gastroenterology",
+          "Pediatrics",
+          "Psychiatry",
+          "Dermatology",
+          "Respiratory",
+          "Urology",
+          "Rheumatology"
+        ]
+      },
+      "incomingAmbulances": [
+        {
+          "ambulanceId": "#AMB-102",
+          "caseType": "Critical Trauma",
+          "priority": 1,
+          "eta": 4,
+          "status": "Active",
+          "progress": 80
+        },
+        {
+          "ambulanceId": "#AMB-089",
+          "caseType": "Cardiac",
+          "priority": 2,
+          "eta": 12,
+          "status": "Stable",
+          "progress": 45
+        },
+        {
+          "ambulanceId": "#AMB-214",
+          "caseType": "Respiratory",
+          "priority": 3,
+          "eta": 18,
+          "status": "Urgent",
+          "progress": 25
+        }
+      ],
+      "icuCapacity": 95,
+      "alerts": [
+        {
+          "type": "CRITICAL",
+          "message": "ICU Capacity at 95%. Diversion protocol recommended for non-trauma cases."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "City Hospital",
+      "password": "cityhosp456",
+      "email": "admin@cityhospital.com",
+      "phone": "+1-555-0102",
+      "address": "456 Hospital Avenue, Downtown, HC 54321",
+      "ambulanceCount": 8,
+      "staffCount": {
+        "Emergency Medicine": 42,
+        "Internal Medicine": 38,
+        "Cardiology": 40,
+        "Radiology": 35,
+        "Pathology": 28,
+        "Anesthesia": 36,
+        "Surgery": 41,
+        "Obstetrics": 34,
+        "Pediatrics": 32,
+        "Rehabilitation": 24
+      },
+      "bedsAvailable": 51,
+      "bloodInventory": {
+        "total": 950,
+        "bloodTypes": [
+          {
+            "type": "A+",
+            "liters": 280
+          },
+          {
+            "type": "A-",
+            "liters": 35
+          },
+          {
+            "type": "B+",
+            "liters": 250
+          },
+          {
+            "type": "B-",
+            "liters": 60
+          },
+          {
+            "type": "O+",
+            "liters": 220
+          },
+          {
+            "type": "O-",
+            "liters": 25
+          },
+          {
+            "type": "AB+",
+            "liters": 50
+          },
+          {
+            "type": "AB-",
+            "liters": 30
+          }
+        ]
+      },
+      "specialties": {
+        "active": 10,
+        "list": [
+          "Emergency Medicine",
+          "Internal Medicine",
+          "Cardiology",
+          "Radiology",
+          "Pathology",
+          "Anesthesia",
+          "Surgery",
+          "Obstetrics",
+          "Pediatrics",
+          "Rehabilitation"
+        ]
+      },
+      "incomingAmbulances": [
+        {
+          "ambulanceId": "#AMB-045",
+          "caseType": "Fractured Leg",
+          "priority": 2,
+          "eta": 6,
+          "status": "In Transit",
+          "progress": 60
+        },
+        {
+          "ambulanceId": "#AMB-067",
+          "caseType": "Chest Pain",
+          "priority": 2,
+          "eta": 9,
+          "status": "In Transit",
+          "progress": 35
+        }
+      ],
+      "icuCapacity": 75,
+      "alerts": [
+        {
+          "type": "WARNING",
+          "message": "Blood inventory running low. Urgent replenishment needed for O- type."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Emergency Care Institute",
+      "password": "emergencycare789",
+      "email": "admin@eci.com",
+      "phone": "+1-555-0103",
+      "address": "789 Emergency Lane, Relief City, HC 98765",
+      "ambulanceCount": 15,
+      "staffCount": {
+        "Trauma Surgery": 50,
+        "Emergency Medicine": 48,
+        "Critical Care": 45,
+        "Cardiothoracic Surgery": 42,
+        "Neurosurgery": 40,
+        "Orthopedic Surgery": 38,
+        "General Surgery": 42,
+        "Vascular Surgery": 35,
+        "Burn Unit": 38,
+        "Toxicology": 25,
+        "Infectious Disease": 32,
+        "Endocrinology": 28,
+        "Nephrology": 30,
+        "Hepatology": 26
+      },
+      "bedsAvailable": 50,
+      "bloodInventory": {
+        "total": 1500,
+        "bloodTypes": [
+          {
+            "type": "A+",
+            "liters": 400
+          },
+          {
+            "type": "A-",
+            "liters": 80
+          },
+          {
+            "type": "B+",
+            "liters": 350
+          },
+          {
+            "type": "B-",
+            "liters": 100
+          },
+          {
+            "type": "O+",
+            "liters": 380
+          },
+          {
+            "type": "O-",
+            "liters": 50
+          },
+          {
+            "type": "AB+",
+            "liters": 90
+          },
+          {
+            "type": "AB-",
+            "liters": 50
+          }
+        ]
+      },
+      "specialties": {
+        "active": 14,
+        "list": [
+          "Trauma Surgery",
+          "Emergency Medicine",
+          "Critical Care",
+          "Cardiothoracic Surgery",
+          "Neurosurgery",
+          "Orthopedic Surgery",
+          "General Surgery",
+          "Vascular Surgery",
+          "Burn Unit",
+          "Toxicology",
+          "Infectious Disease",
+          "Endocrinology",
+          "Nephrology",
+          "Hepatology"
+        ]
+      },
+      "incomingAmbulances": [
+        {
+          "ambulanceId": "#AMB-156",
+          "caseType": "Multi-Trauma",
+          "priority": 1,
+          "eta": 3,
+          "status": "Critical",
+          "progress": 85
+        },
+        {
+          "ambulanceId": "#AMB-178",
+          "caseType": "Burn Injury",
+          "priority": 1,
+          "eta": 7,
+          "status": "Critical",
+          "progress": 50
+        },
+        {
+          "ambulanceId": "#AMB-223",
+          "caseType": "Stroke",
+          "priority": 1,
+          "eta": 8,
+          "status": "Urgent",
+          "progress": 40
+        }
+      ],
+      "icuCapacity": 85,
+      "alerts": [
+        {
+          "type": "INFO",
+          "message": "Trauma surgery team on standby. Operating rooms prepared."
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "St. Mary's Hospital",
+      "password": "stmary2024",
+      "email": "admin@stmaryshospital.com",
+      "phone": "+1-555-0104",
+      "address": "321 Sacred Heart Ave, Holy City, HC 11223",
+      "ambulanceCount": 7,
+      "staffCount": {
+        "Oncology": 38,
+        "Cardiology": 35,
+        "Pulmonology": 32,
+        "Gastroenterology": 28,
+        "Neurology": 30,
+        "Dermatology": 22,
+        "ENT": 26,
+        "Ophthalmology": 24,
+        "Rheumatology": 20,
+        "Immunology": 18,
+        "Nephrology": 27
+      },
+      "bedsAvailable": 53,
+      "bloodInventory": {
+        "total": 800,
+        "bloodTypes": [
+          {
+            "type": "A+",
+            "liters": 200
+          },
+          {
+            "type": "A-",
+            "liters": 40
+          },
+          {
+            "type": "B+",
+            "liters": 180
+          },
+          {
+            "type": "B-",
+            "liters": 50
+          },
+          {
+            "type": "O+",
+            "liters": 200
+          },
+          {
+            "type": "O-",
+            "liters": 30
+          },
+          {
+            "type": "AB+",
+            "liters": 60
+          },
+          {
+            "type": "AB-",
+            "liters": 40
+          }
+        ]
+      },
+      "specialties": {
+        "active": 11,
+        "list": [
+          "Oncology",
+          "Cardiology",
+          "Pulmonology",
+          "Gastroenterology",
+          "Neurology",
+          "Dermatology",
+          "ENT",
+          "Ophthalmology",
+          "Rheumatology",
+          "Immunology",
+          "Nephrology"
+        ]
+      },
+      "incomingAmbulances": [
+        {
+          "ambulanceId": "#AMB-301",
+          "caseType": "Heart Attack",
+          "priority": 1,
+          "eta": 5,
+          "status": "Critical",
+          "progress": 70
+        }
+      ],
+      "icuCapacity": 62,
+      "alerts": [
+        {
+          "type": "WARNING",
+          "message": "Cardiology unit is at capacity. Some cases may need to be redirected."
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "General Hospital Network",
+      "password": "general5678",
+      "email": "admin@generalhosp.com",
+      "phone": "+1-555-0105",
+      "address": "654 Healing Boulevard, Wellness County, HC 77777",
+      "ambulanceCount": 10,
+      "staffCount": {
+        "General Medicine": 40,
+        "Surgery": 42,
+        "Pediatrics": 36,
+        "Obstetrics & Gynecology": 38,
+        "Psychiatry": 28,
+        "Urology": 30,
+        "ENT": 26,
+        "Orthopedics": 34,
+        "Anesthesia": 35,
+        "Radiology": 32,
+        "Pathology": 25,
+        "Microbiology": 22,
+        "Pharmacology": 20
+      },
+      "bedsAvailable": 61,
+      "bloodInventory": {
+        "total": 1100,
+        "bloodTypes": [
+          {
+            "type": "A+",
+            "liters": 300
+          },
+          {
+            "type": "A-",
+            "liters": 50
+          },
+          {
+            "type": "B+",
+            "liters": 280
+          },
+          {
+            "type": "B-",
+            "liters": 70
+          },
+          {
+            "type": "O+",
+            "liters": 280
+          },
+          {
+            "type": "O-",
+            "liters": 40
+          },
+          {
+            "type": "AB+",
+            "liters": 60
+          },
+          {
+            "type": "AB-",
+            "liters": 40
+          }
+        ]
+      },
+      "specialties": {
+        "active": 13,
+        "list": [
+          "General Medicine",
+          "Surgery",
+          "Pediatrics",
+          "Obstetrics & Gynecology",
+          "Psychiatry",
+          "Urology",
+          "ENT",
+          "Orthopedics",
+          "Anesthesia",
+          "Radiology",
+          "Pathology",
+          "Microbiology",
+          "Pharmacology"
+        ]
+      },
+      "incomingAmbulances": [
+        {
+          "ambulanceId": "#AMB-412",
+          "caseType": "Childbirth",
+          "priority": 2,
+          "eta": 10,
+          "status": "In Transit",
+          "progress": 30
+        },
+        {
+          "ambulanceId": "#AMB-489",
+          "caseType": "Abdominal Pain",
+          "priority": 2,
+          "eta": 15,
+          "status": "In Transit",
+          "progress": 20
+        }
+      ],
+      "icuCapacity": 68,
+      "alerts": [
+        {
+          "type": "INFO",
+          "message": "OB/GYN department is fully operational. Maternity ward ready for admissions."
+        }
+      ]
+    }
+  ]
+}

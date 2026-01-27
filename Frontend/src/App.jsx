@@ -3,7 +3,7 @@ import Login from "./pages/Login";
 
 import AmbulanceUser from "./pages/AmbulanceUser";
 import isAuthenticated from "./Hooks/isAuthenticated";
-import HospitalAdmin from "./pages/HospitalAdmin";
+import HospitalAdmin from "./pages/hospitals/HospitalAdmin";
 import GuestUser from "./pages/GuestUser";
 
 const router = createBrowserRouter([
@@ -13,19 +13,24 @@ const router = createBrowserRouter([
   },
   {
     path: "/ambulance",
-    element: <isAuthenticated><AmbulanceUser /></isAuthenticated>,
+    element: (
+      <isAuthenticated>
+        <AmbulanceUser />
+      </isAuthenticated>
+    ),
   },
   {
     path: "/hospital",
-    element: <isAuthenticated><HospitalAdmin /></isAuthenticated>,
-  }
+    element: (
+      <isAuthenticated>
+        <HospitalAdmin />
+      </isAuthenticated>
+    ),
+  },
 ]);
 
 function App() {
-
-  return (
-    <RouterProvider router={router} />
-  )
+  return <RouterProvider router={router} />;
 }
 
 export default App;
