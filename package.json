@@ -1,0 +1,8 @@
+{
+    "name": "hackathon-root",
+    "version": "1.0.0",
+    "scripts": {
+        "backend": "cd Backend && npm start",
+        "backend:dev": "cd Backend && npm run dev"
+    }
+}
