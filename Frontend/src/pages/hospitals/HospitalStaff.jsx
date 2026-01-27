@@ -14,16 +14,28 @@ function HospitalStaff() {
   // API endpoint placeholder - to be filled later
   const API_ENDPOINT = "";
 
-  // Icons for each staff category
+  // Icons for each specialist category
   const staffIcons = {
-    "Emergency Physicians": "medical_services",
-    Surgeons: "content_cut",
-    "ICU Nurses": "vital_signs",
-    Paramedics: "ambulance",
-    Anesthesiologists: "masks",
-    Radiologists: "radiology",
-    "Lab Technicians": "biotech",
-    "Support Staff": "volunteer_activism",
+    Cardiologist: "cardiology",
+    Neurologist: "neurology",
+    "Orthopedic Surgeon": "orthopedics",
+    "General Surgeon": "surgical",
+    Anesthesiologist: "masks",
+    Radiologist: "radiology",
+    Oncologist: "oncology",
+    Pediatrician: "pediatrics",
+    Psychiatrist: "psychiatry",
+    Dermatologist: "dermatology",
+    Gastroenterologist: "gastroenterology",
+    Nephrologist: "nephrology",
+    Pulmonologist: "pulmonology",
+    Endocrinologist: "endocrinology",
+    Rheumatologist: "rheumatology",
+    Urologist: "urology",
+    Ophthalmologist: "ophthalmology",
+    "ENT Specialist": "hearing",
+    Gynecologist: "gynecology",
+    "Emergency Medicine Specialist": "emergency",
   };
 
   const handleLogout = () => {
@@ -33,15 +45,16 @@ function HospitalStaff() {
     navigate("/", { replace: true });
   };
 
-  // Load hospital data from JSON based on localStorage ID
+  // Load hospital data from JSON based on localStorage userName
   useEffect(() => {
     const loadHospitalData = async () => {
       try {
         const response = await fetch("/hospitals.json");
         const data = await response.json();
-        const hospitalId = parseInt(localStorage.getItem("hospitalId")) || 1;
+        // Get hospital name from localStorage (set during login)
+        const userName = localStorage.getItem("userName");
         const selectedHospital = data.hospitals.find(
-          (h) => h.id === hospitalId,
+          (h) => h.name === userName,
         );
 
         if (!selectedHospital) {

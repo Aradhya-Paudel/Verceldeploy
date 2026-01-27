@@ -17,17 +17,16 @@ function HospitalDashboard() {
     navigate("/", { replace: true });
   };
 
-  // Load hospital data from JSON based on localStorage ID
+  // Load hospital data from JSON based on localStorage userName
   useEffect(() => {
     const loadHospitalData = async () => {
       try {
         const response = await fetch("/hospitals.json");
         const data = await response.json();
-        // Get hospital ID from localStorage
-        const hospitalId =
-          localStorage.getItem("hospitalId") || data.hospitals[0].id;
+        // Get hospital name from localStorage (set during login)
+        const userName = localStorage.getItem("userName");
         const selectedHospital = data.hospitals.find(
-          (h) => h.id === hospitalId,
+          (h) => h.name === userName,
         );
 
         if (!selectedHospital) {
@@ -174,7 +173,7 @@ function HospitalDashboard() {
               <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="text-blue-600 font-bold text-sm uppercase tracking-wider">
-                    Active Specialties
+                    Active Specialists
                   </h3>
                   <span className="material-symbols-outlined text-blue-600">
                     medical_services
@@ -182,11 +181,15 @@ function HospitalDashboard() {
                 </div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-bold text-slate-900">
-                    {hospital.specialties.active}
+                    {
+                      Object.values(hospital.staffCount).filter(
+                        (count) => count > 0,
+                      ).length
+                    }
                   </span>
                 </div>
                 <p className="text-slate-600 text-xs mt-2">
-                  Available departments
+                  Available specialists
                 </p>
               </div>
             </div>

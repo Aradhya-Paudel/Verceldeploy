@@ -7,6 +7,7 @@
       "email": "admin@centralmed.com",
       "phone": "+1-555-0101",
       "address": "123 Medical Plaza, Healthcare City, HC 12345",
+      "location": "",
       "ambulanceCount": 12,
       "bedsAvailable": 50,
       "bloodInventory": {
@@ -23,31 +24,26 @@
         ]
       },
       "staffCount": {
-        "Emergency Physicians": 14,
-        "Surgeons": 8,
-        "ICU Nurses": 32,
-        "Paramedics": 18,
-        "Anesthesiologists": 6,
-        "Radiologists": 4,
-        "Lab Technicians": 12,
-        "Support Staff": 25
-      },
-      "specialties": {
-        "active": 12,
-        "list": [
-          "Trauma Surgery",
-          "Cardiology",
-          "Neurology",
-          "Orthopedics",
-          "Oncology",
-          "Gastroenterology",
-          "Pediatrics",
-          "Psychiatry",
-          "Dermatology",
-          "Respiratory",
-          "Urology",
-          "Rheumatology"
-        ]
+        "Cardiologist": 3,
+        "Neurologist": 2,
+        "Orthopedic Surgeon": 2,
+        "General Surgeon": 3,
+        "Anesthesiologist": 2,
+        "Radiologist": 1,
+        "Oncologist": 2,
+        "Pediatrician": 3,
+        "Psychiatrist": 1,
+        "Dermatologist": 2,
+        "Gastroenterologist": 1,
+        "Nephrologist": 1,
+        "Pulmonologist": 2,
+        "Endocrinologist": 1,
+        "Rheumatologist": 0,
+        "Urologist": 1,
+        "Ophthalmologist": 2,
+        "ENT Specialist": 1,
+        "Gynecologist": 2,
+        "Emergency Medicine Specialist": 3
       },
       "incomingAmbulances": [
         {
@@ -101,6 +97,7 @@
       "email": "admin@cityhospital.com",
       "phone": "+1-555-0102",
       "address": "456 Hospital Avenue, Downtown, HC 54321",
+      "location": "",
       "ambulanceCount": 8,
       "bedsAvailable": 51,
       "bloodInventory": {
@@ -117,29 +114,26 @@
         ]
       },
       "staffCount": {
-        "Emergency Physicians": 10,
-        "Surgeons": 6,
-        "ICU Nurses": 24,
-        "Paramedics": 12,
-        "Anesthesiologists": 4,
-        "Radiologists": 3,
-        "Lab Technicians": 8,
-        "Support Staff": 20
-      },
-      "specialties": {
-        "active": 10,
-        "list": [
-          "Emergency Medicine",
-          "Internal Medicine",
-          "Cardiology",
-          "Radiology",
-          "Pathology",
-          "Anesthesia",
-          "Surgery",
-          "Obstetrics",
-          "Pediatrics",
-          "Rehabilitation"
-        ]
+        "Cardiologist": 2,
+        "Neurologist": 1,
+        "Orthopedic Surgeon": 1,
+        "General Surgeon": 2,
+        "Anesthesiologist": 1,
+        "Radiologist": 1,
+        "Oncologist": 0,
+        "Pediatrician": 2,
+        "Psychiatrist": 1,
+        "Dermatologist": 1,
+        "Gastroenterologist": 2,
+        "Nephrologist": 0,
+        "Pulmonologist": 1,
+        "Endocrinologist": 1,
+        "Rheumatologist": 1,
+        "Urologist": 0,
+        "Ophthalmologist": 1,
+        "ENT Specialist": 2,
+        "Gynecologist": 1,
+        "Emergency Medicine Specialist": 2
       },
       "incomingAmbulances": [
         {
@@ -177,6 +171,7 @@
       "email": "admin@eci.com",
       "phone": "+1-555-0103",
       "address": "789 Emergency Lane, Relief City, HC 98765",
+      "location": "",
       "ambulanceCount": 15,
       "bedsAvailable": 50,
       "bloodInventory": {
@@ -193,33 +188,26 @@
         ]
       },
       "staffCount": {
-        "Emergency Physicians": 18,
-        "Surgeons": 12,
-        "ICU Nurses": 40,
-        "Paramedics": 25,
-        "Anesthesiologists": 8,
-        "Radiologists": 5,
-        "Lab Technicians": 15,
-        "Support Staff": 30
-      },
-      "specialties": {
-        "active": 14,
-        "list": [
-          "Trauma Surgery",
-          "Emergency Medicine",
-          "Critical Care",
-          "Cardiothoracic Surgery",
-          "Neurosurgery",
-          "Orthopedic Surgery",
-          "General Surgery",
-          "Vascular Surgery",
-          "Burn Unit",
-          "Toxicology",
-          "Infectious Disease",
-          "Endocrinology",
-          "Nephrology",
-          "Hepatology"
-        ]
+        "Cardiologist": 3,
+        "Neurologist": 3,
+        "Orthopedic Surgeon": 3,
+        "General Surgeon": 3,
+        "Anesthesiologist": 3,
+        "Radiologist": 2,
+        "Oncologist": 2,
+        "Pediatrician": 2,
+        "Psychiatrist": 1,
+        "Dermatologist": 1,
+        "Gastroenterologist": 2,
+        "Nephrologist": 2,
+        "Pulmonologist": 3,
+        "Endocrinologist": 1,
+        "Rheumatologist": 1,
+        "Urologist": 2,
+        "Ophthalmologist": 1,
+        "ENT Specialist": 1,
+        "Gynecologist": 2,
+        "Emergency Medicine Specialist": 3
       },
       "incomingAmbulances": [
         {
@@ -273,6 +261,7 @@
       "email": "admin@stmaryshospital.com",
       "phone": "+1-555-0104",
       "address": "321 Sacred Heart Ave, Holy City, HC 11223",
+      "location": "",
       "ambulanceCount": 7,
       "bedsAvailable": 53,
       "bloodInventory": {
@@ -289,30 +278,26 @@
         ]
       },
       "staffCount": {
-        "Emergency Physicians": 8,
-        "Surgeons": 5,
-        "ICU Nurses": 20,
-        "Paramedics": 10,
-        "Anesthesiologists": 3,
-        "Radiologists": 2,
-        "Lab Technicians": 6,
-        "Support Staff": 18
-      },
-      "specialties": {
-        "active": 11,
-        "list": [
-          "Oncology",
-          "Cardiology",
-          "Pulmonology",
-          "Gastroenterology",
-          "Neurology",
-          "Dermatology",
-          "ENT",
-          "Ophthalmology",
-          "Rheumatology",
-          "Immunology",
-          "Nephrology"
-        ]
+        "Cardiologist": 2,
+        "Neurologist": 1,
+        "Orthopedic Surgeon": 1,
+        "General Surgeon": 2,
+        "Anesthesiologist": 1,
+        "Radiologist": 1,
+        "Oncologist": 3,
+        "Pediatrician": 1,
+        "Psychiatrist": 2,
+        "Dermatologist": 1,
+        "Gastroenterologist": 1,
+        "Nephrologist": 2,
+        "Pulmonologist": 1,
+        "Endocrinologist": 0,
+        "Rheumatologist": 2,
+        "Urologist": 1,
+        "Ophthalmologist": 1,
+        "ENT Specialist": 0,
+        "Gynecologist": 1,
+        "Emergency Medicine Specialist": 2
       },
       "incomingAmbulances": [
         {
@@ -350,6 +335,7 @@
       "email": "admin@generalhosp.com",
       "phone": "+1-555-0105",
       "address": "654 Healing Boulevard, Wellness County, HC 77777",
+      "location": "",
       "ambulanceCount": 10,
       "bedsAvailable": 61,
       "bloodInventory": {
@@ -366,32 +352,26 @@
         ]
       },
       "staffCount": {
-        "Emergency Physicians": 12,
-        "Surgeons": 7,
-        "ICU Nurses": 28,
-        "Paramedics": 15,
-        "Anesthesiologists": 5,
-        "Radiologists": 4,
-        "Lab Technicians": 10,
-        "Support Staff": 22
-      },
-      "specialties": {
-        "active": 13,
-        "list": [
-          "General Medicine",
-          "Surgery",
-          "Pediatrics",
-          "Obstetrics & Gynecology",
-          "Psychiatry",
-          "Urology",
-          "ENT",
-          "Orthopedics",
-          "Anesthesia",
-          "Radiology",
-          "Pathology",
-          "Microbiology",
-          "Pharmacology"
-        ]
+        "Cardiologist": 2,
+        "Neurologist": 2,
+        "Orthopedic Surgeon": 2,
+        "General Surgeon": 2,
+        "Anesthesiologist": 2,
+        "Radiologist": 1,
+        "Oncologist": 1,
+        "Pediatrician": 3,
+        "Psychiatrist": 2,
+        "Dermatologist": 0,
+        "Gastroenterologist": 1,
+        "Nephrologist": 1,
+        "Pulmonologist": 1,
+        "Endocrinologist": 2,
+        "Rheumatologist": 0,
+        "Urologist": 2,
+        "Ophthalmologist": 1,
+        "ENT Specialist": 2,
+        "Gynecologist": 3,
+        "Emergency Medicine Specialist": 2
       },
       "incomingAmbulances": [
         {

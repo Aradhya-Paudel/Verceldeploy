@@ -21,16 +21,16 @@ function HospitalInventory() {
     navigate("/", { replace: true });
   };
 
-  // Load hospital data from JSON based on localStorage ID
+  // Load hospital data from JSON based on localStorage userName
   useEffect(() => {
     const loadHospitalData = async () => {
       try {
         const response = await fetch("/hospitals.json");
         const data = await response.json();
-        // Get hospital ID from localStorage
-        const hospitalId = parseInt(localStorage.getItem("hospitalId")) || 1;
+        // Get hospital name from localStorage (set during login)
+        const userName = localStorage.getItem("userName");
         const selectedHospital = data.hospitals.find(
-          (h) => h.id === hospitalId,
+          (h) => h.name === userName,
         );
 
         if (!selectedHospital) {
