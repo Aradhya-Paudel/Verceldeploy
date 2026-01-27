@@ -2,21 +2,30 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../supabaseClient');
 const locationService = require('../utils/locationService');
+const rateLimiter = require('../middleware/rateLimiter');
 
 // POST /api/match
 // Match Best Hospital
-router.post('/match', async (req, res) => {
+router.post('/match', rateLimiter, async (req, res) => {
     let { latitude, longitude, address, injuryType, bloodType, excludeIds } = req.body;
 
     // 1. Resolve Coordinates
     if (!latitude || !longitude) {
         if (address) {
             // Attempt to geocode
-            const geoResult = await locationService.geocodeAddress(address);
-            if (geoResult) {
-                latitude = geoResult.latitude;
-                longitude = geoResult.longitude;
-            } else {
+            try {
+                const geoResult = await locationService.geocodeAddress(address);
+                if (geoResult && Number.isFinite(geoResult.latitude) && Number.isFinite(geoResult.longitude)) {
+                    latitude = geoResult.latitude;
+                    longitude = geoResult.longitude;
+                } else {
+                    return res.status(400).json({
+                        error: "Unable to geocode address. Please provide valid coordinates or a specific address.",
+                        code: "GEOCODING_FAILED"
+                    });
+                }
+            } catch (error) {
+                console.error('Geocoding Error:', error.message);
                 return res.status(400).json({
                     error: "Unable to geocode address. Please provide valid coordinates or a specific address.",
                     code: "GEOCODING_FAILED"
@@ -31,7 +40,7 @@ router.post('/match', async (req, res) => {
     }
 
     // 2. Validate Coordinates
-    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+    if (!Number.isFinite(Number(latitude)) || !Number.isFinite(Number(longitude)) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
         return res.status(400).json({
             error: "Invalid coordinates. Latitude must be between -90 and 90, longitude between -180 and 180.",
             code: "INVALID_COORDINATES"
