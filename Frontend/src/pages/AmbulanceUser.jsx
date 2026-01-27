@@ -3,9 +3,14 @@ import { useNavigate } from "react-router-dom";
 
 function AmbulanceUser() {
   const navigate = useNavigate();
-  const [ambulanceData, setAmbulanceData] = useState({});
+  const [ambulanceData, setAmbulanceData] = useState(null);
   const [user, setUser] = useState("");
   const [incidents, setIncidents] = useState([]);
+  const [location, setLocation] = useState(null);
+  const [locationError, setLocationError] = useState(null);
+  const [locationStatus, setLocationStatus] = useState("idle"); // idle, requesting, active
+
+  const API_ENDPOINT = ""; // Empty for now, will be configured later
 
   useEffect(() => {
     const userName = localStorage.getItem("userName");
@@ -18,12 +23,96 @@ function AmbulanceUser() {
 
     setUser(userName);
 
-    // Fetch submissions data instead of active incidents
+    // Fetch submissions data
     fetch("/submissions.json")
       .then((res) => res.json())
       .then((data) => setIncidents(data.submissions))
       .catch((error) => console.error("Error loading incidents:", error));
+
+    // Request location permission and start tracking
+    requestLocationPermission();
   }, [navigate]);
+
+  const requestLocationPermission = async () => {
+    setLocationStatus("requesting");
+    setLocationError(null);
+
+    if (!("geolocation" in navigator)) {
+      setLocationError("Geolocation is not supported by your browser.");
+      setLocationStatus("idle");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const coords = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+          timestamp: new Date().toISOString(),
+          ambulanceName: user,
+        };
+
+        setLocation(coords);
+        setLocationStatus("active");
+        postLocationToBackend(coords);
+
+        // Watch position for continuous updates
+        const watchId = navigator.geolocation.watchPosition(
+          (newPosition) => {
+            const updatedCoords = {
+              latitude: newPosition.coords.latitude,
+              longitude: newPosition.coords.longitude,
+              accuracy: newPosition.coords.accuracy,
+              timestamp: new Date().toISOString(),
+              ambulanceName: user,
+            };
+            setLocation(updatedCoords);
+            postLocationToBackend(updatedCoords);
+          },
+          (error) => {
+            console.error("Error watching position:", error);
+          },
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 },
+        );
+
+        // Cleanup watchPosition on unmount
+        return () => navigator.geolocation.clearWatch(watchId);
+      },
+      (error) => {
+        let errorMsg = "Unable to retrieve location";
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMsg =
+            "Location permission denied. Please enable location access in your browser.";
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          errorMsg = "Location information is unavailable.";
+        } else if (error.code === error.TIMEOUT) {
+          errorMsg = "The request to get location timed out.";
+        }
+        setLocationError(errorMsg);
+        setLocationStatus("idle");
+        console.error("Location error:", error);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+    );
+  };
+
+  const postLocationToBackend = async (coords) => {
+    if (API_ENDPOINT) {
+      try {
+        await fetch(`${API_ENDPOINT}/ambulance-location`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(coords),
+        });
+      } catch (error) {
+        console.error("Error posting location:", error);
+      }
+    } else {
+      // For now, just log to console (API not configured)
+      console.log("Ambulance location update:", coords);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("adminAuth");
@@ -47,6 +136,34 @@ function AmbulanceUser() {
             </span>
           </div>
           <div className="flex items-center gap-2 md:gap-6">
+            {/* Location Status Indicator */}
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg">
+              <span
+                className={`w-2.5 h-2.5 rounded-full animate-pulse ${
+                  locationStatus === "active"
+                    ? "bg-green-500"
+                    : locationStatus === "requesting"
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
+                }`}
+              ></span>
+              <span className="text-xs font-semibold text-slate-700">
+                {locationStatus === "active"
+                  ? "Location Active"
+                  : locationStatus === "requesting"
+                    ? "Requesting..."
+                    : "No Location"}
+              </span>
+            </div>
+
+            {/* Location Error Alert */}
+            {locationError && (
+              <div className="hidden lg:flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
+                <span className="material-symbols-outlined text-sm">error</span>
+                <span>{locationError}</span>
+              </div>
+            )}
+
             <button className="bg-primary text-white hover:bg-slate-800 px-3 md:px-6 py-2 rounded-lg font-bold flex items-center gap-1 md:gap-2 transition-all active:scale-95 text-xs md:text-sm">
               <span className="material-symbols-outlined text-lg">call</span>
               <span className="hidden sm:inline">Got a Call?</span>
