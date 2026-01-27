@@ -7,6 +7,7 @@ import HospitalDashboard from "./pages/hospitals/HospitalDashboard";
 import HospitalInventory from "./pages/hospitals/HospitalInventory";
 import GuestUser from "./pages/GuestUser";
 import HospitalStaff from "./pages/hospitals/HospitalStaff";
+import HospitalFleet from "./pages/hospitals/HospitalFleet";
 
 const router = createBrowserRouter([
   {
@@ -43,6 +44,14 @@ const router = createBrowserRouter([
       <IsAuthenticated>
         <HospitalStaff />
         </IsAuthenticated>
+    ),
+  },
+  {
+    path: "/hospital/fleet",
+    element: (
+      <IsAuthenticated>
+        <HospitalFleet />
+      </IsAuthenticated>
     ),
   },
   {
