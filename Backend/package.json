@@ -5,15 +5,29 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "node --watch index.js"
+    "dev": "node --watch index.js",
+    "test": "node tests/comprehensive-test.js",
+    "test:verbose": "node tests/comprehensive-test.js --verbose",
+    "test:quick": "bash tests/quick-smoke-test.sh",
+    "test:phase5": "node tests/phase5-tests.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@supabase/supabase-js": "^2.49.0",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.0",
-    "express": "^4.21.0"
+    "express": "^4.21.0",
+    "express-rate-limit": "^8.2.1",
+    "firebase-admin": "^13.6.0",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
+    "socket.io": "^4.8.3",
+    "winston": "^3.19.0"
+  },
+  "devDependencies": {
+    "axios": "^1.13.3"
   }
 }

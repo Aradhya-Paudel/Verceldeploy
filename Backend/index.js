@@ -6,6 +6,11 @@ const supabase = require('./supabaseClient');
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Startup Validation
+if (!process.env.LOCATIONIQ_API_KEY) {
+    console.warn('\n⚠️  WARNING: LocationIQ API key not configured. Map features will be disabled.\n');
+}
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -28,7 +33,24 @@ app.get('/health', async (req, res) => {
     }
 });
 
+<<<<<<< HEAD
 // Get All Hospitals (Summary View)
+=======
+const hospitalRoutes = require('./routes/hospital');
+const authRoutes = require('./routes/auth');
+const logger = require('./utils/logger'); // Will create this soon, but let's prep
+
+// Routes
+app.use('/api', require('./routes/match'));
+app.use('/api', require('./routes/map'));
+app.use('/api', hospitalRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/analytics', require('./routes/analytics'));
+app.use('/api/ambulance', require('./routes/ambulance'));
+app.use('/api/ai', require('./routes/ai')); // AI Integration
+
+// Summary Endpoint (Legacy support if needed, but sticking to new routes)
+>>>>>>> 0375cebc56d2e734e055d09a07726edd1ed35eaa
 app.get('/api/hospitals', async (req, res) => {
     try {
         const { data, error } = await supabase.from('hospitals_summary').select('*');
@@ -40,6 +62,7 @@ app.get('/api/hospitals', async (req, res) => {
     }
 });
 
+<<<<<<< HEAD
 /**
  * Match Best Hospital
  * POST /api/match
@@ -79,6 +102,8 @@ app.post('/api/match', async (req, res) => {
     }
 });
 
+=======
+>>>>>>> 0375cebc56d2e734e055d09a07726edd1ed35eaa
 // Root Route
 app.get('/', (req, res) => {
     res.json({
@@ -86,7 +111,14 @@ app.get('/', (req, res) => {
         endpoints: {
             health: '/health',
             hospitals: '/api/hospitals',
+<<<<<<< HEAD
             match: '/api/match'
+=======
+            hospitalsMap: '/api/hospitals/map',
+            match: '/api/match',
+            geocode: '/api/geocode',
+            auth: '/api/auth'
+>>>>>>> 0375cebc56d2e734e055d09a07726edd1ed35eaa
         }
     });
 });
@@ -101,9 +133,13 @@ app.use((err, req, res, next) => {
 });
 
 // Start Server
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`\n---------------------------------------------------`);
     console.log(`Server running on http://localhost:${port}`);
     console.log(`Supabase Connection Initialized`);
     console.log(`---------------------------------------------------\n`);
 });
+
+// Initialize WebSockets
+const socketManager = require('./utils/socketManager');
+socketManager.init(server);
