@@ -1,0 +1,818 @@
+{
+  "project_name": "Emergency Response System Backend",
+  "project_description": "Backend system for ambulance dispatch, hospital management, and emergency response coordination",
+  
+  "development_phases": [
+    {
+      "phase": 1,
+      "name": "Project Setup & Structure",
+      "tasks": [
+        {
+          "task_id": "1.1",
+          "description": "Create backend folder structure",
+          "deliverables": [
+            "backend/",
+            "backend/src/",
+            "backend/src/routes/",
+            "backend/src/controllers/",
+            "backend/src/models/",
+            "backend/src/utils/",
+            "backend/src/middleware/",
+            "backend/data/"
+          ],
+          "validation": "Folder structure created successfully"
+        },
+        {
+          "task_id": "1.2",
+          "description": "Initialize Node.js project with package.json",
+          "dependencies": [
+            "express",
+            "cors",
+            "dotenv",
+            "body-parser",
+            "nodemon"
+          ],
+          "deliverables": [
+            "backend/package.json",
+            "backend/.env.example"
+          ],
+          "validation": "package.json created with all dependencies"
+        },
+        {
+          "task_id": "1.3",
+          "description": "Create main server file",
+          "deliverables": [
+            "backend/src/server.js"
+          ],
+          "requirements": [
+            "Express server setup",
+            "CORS enabled",
+            "Port configuration from .env",
+            "Basic error handling"
+          ],
+          "validation": "Server starts without errors"
+        }
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "Data Models & Storage",
+      "tasks": [
+        {
+          "task_id": "2.1",
+          "description": "Create JSON data files from provided structures",
+          "source_data": {
+            "hospitals": {
+              "file": "backend/data/hospitals.json",
+              "structure": "Array of hospital objects with id, name, password, email, phone, address, location, latitude, longitude, ambulanceCount, bedsAvailable, bloodInventory (total, bloodTypes array), staffCount (object with specialties), incomingAmbulances (array), bloodRequests (array)",
+              "initial_data": "Use provided hospital JSON structure, add 3-5 hospitals",
+              "password_storage": "Store passwords in same JSON (no hashing required)"
+            },
+            "ambulances": {
+              "file": "backend/data/ambulances.json",
+              "structure": "Array of ambulance objects with name (id), password, latitude, longitude, status (active/busy), currentCasualtyId (if busy)",
+              "initial_data": "Use provided ambulance JSON structure, add 5-8 ambulances",
+              "password_storage": "Store passwords in same JSON (no hashing required)",
+              "note": "Add status field (default: 'active') and currentCasualtyId field (default: null)"
+            },
+            "submissions": {
+              "file": "backend/data/submissions.json",
+              "structure": "Array of submission objects with id, title, image (base64), location, latitude, longitude, accuracy, time, status (pending/assigned/completed), assignedAmbulance (ambulance name if assigned)",
+              "initial_data": "Use provided submission JSON structure",
+              "note": "Add status field (default: 'pending') and assignedAmbulance field (default: null)"
+            },
+            "active_accidents": {
+              "file": "backend/data/active_accidents.json",
+              "structure": "Array of accident objects with id, title, location, severity, image, status, time, assignedAmbulance",
+              "initial_data": "Use provided active accident JSON structure",
+              "note": "Add assignedAmbulance field (default: null)"
+            },
+            "casualties": {
+              "file": "backend/data/casualties.json",
+              "structure": "Array of casualty objects with id, accidentId, bloodType, bloodRequired (liters), severity (critical/urgent/stable), specialtyRequired, hospitalAssigned, status (pending/transported/treated)",
+              "initial_data": "Empty array initially",
+              "note": "This will be populated when ambulance reports casualties"
+            },
+            "blood_requests": {
+              "file": "backend/data/blood_requests.json",
+              "structure": "Array of blood request objects with requestId, fromHospitalId, toHospitalId, bloodType, litersNeeded, status (pending/approved/rejected/completed), createdAt, ambulanceAssigned",
+              "initial_data": "Empty array initially",
+              "note": "For scenario 3 - inter-hospital blood transfer"
+            }
+          },
+          "deliverables": [
+            "backend/data/hospitals.json",
+            "backend/data/ambulances.json",
+            "backend/data/submissions.json",
+            "backend/data/active_accidents.json",
+            "backend/data/casualties.json",
+            "backend/data/blood_requests.json"
+          ],
+          "validation": "All JSON files created with proper structure and sample data"
+        },
+        {
+          "task_id": "2.2",
+          "description": "Create data access utility functions",
+          "deliverables": [
+            "backend/src/utils/dataAccess.js"
+          ],
+          "functions_required": [
+            "readJSON(filename) - reads and parses JSON file",
+            "writeJSON(filename, data) - writes data to JSON file",
+            "getAll(collection) - gets all records from a collection",
+            "getById(collection, id) - gets single record by id",
+            "create(collection, data) - adds new record",
+            "update(collection, id, data) - updates existing record",
+            "delete(collection, id) - deletes record",
+            "findByQuery(collection, query) - finds records matching query"
+          ],
+          "validation": "All CRUD operations working correctly"
+        }
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "Authentication APIs",
+      "tasks": [
+        {
+          "task_id": "3.1",
+          "description": "Create authentication controller",
+          "deliverables": [
+            "backend/src/controllers/authController.js"
+          ],
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/auth/ambulance/login",
+              "description": "Ambulance login",
+              "request_body": {
+                "name": "ambulance name/id",
+                "password": "password"
+              },
+              "response": {
+                "success": true,
+                "data": "ambulance object without password",
+                "token": "simple token (ambulance-{name})"
+              },
+              "validation": "Check name and password in ambulances.json"
+            },
+            {
+              "method": "POST",
+              "path": "/api/auth/hospital/login",
+              "description": "Hospital login",
+              "request_body": {
+                "email": "hospital email",
+                "password": "password"
+              },
+              "response": {
+                "success": true,
+                "data": "hospital object without password",
+                "token": "simple token (hospital-{id})"
+              },
+              "validation": "Check email and password in hospitals.json"
+            }
+          ],
+          "validation": "Both login endpoints working correctly"
+        },
+        {
+          "task_id": "3.2",
+          "description": "Create authentication routes",
+          "deliverables": [
+            "backend/src/routes/authRoutes.js"
+          ],
+          "validation": "Routes connected to controller"
+        }
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "Scenario 1 - Guest User Reports Accident",
+      "tasks": [
+        {
+          "task_id": "4.1",
+          "description": "Create submission controller for guest reports",
+          "deliverables": [
+            "backend/src/controllers/submissionController.js"
+          ],
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/submissions",
+              "description": "Guest user submits accident with photo and location",
+              "request_body": {
+                "title": "accident description",
+                "image": "base64 image data",
+                "location": "address string",
+                "latitude": "number",
+                "longitude": "number",
+                "accuracy": "number"
+              },
+              "logic": [
+                "Generate unique ID (SUB-{timestamp})",
+                "Set time to current timestamp",
+                "Set status to 'pending'",
+                "Save to submissions.json",
+                "Also add to active_accidents.json with auto-detected severity"
+              ],
+              "response": {
+                "success": true,
+                "submissionId": "generated ID",
+                "message": "Emergency reported successfully"
+              }
+            },
+            {
+              "method": "GET",
+              "path": "/api/submissions",
+              "description": "Get all submissions",
+              "response": "Array of all submissions"
+            }
+          ],
+          "validation": "Submission creation working"
+        },
+        {
+          "task_id": "4.2",
+          "description": "Create ambulance location and dispatch controller",
+          "deliverables": [
+            "backend/src/controllers/ambulanceController.js"
+          ],
+          "endpoints": [
+            {
+              "method": "GET",
+              "path": "/api/ambulances/nearest",
+              "description": "Find nearest available ambulance to casualty",
+              "query_params": {
+                "latitude": "casualty latitude",
+                "longitude": "casualty longitude",
+                "radius": "search radius in km (default 50)"
+              },
+              "logic": [
+                "Get all ambulances with status 'active'",
+                "Calculate distance from casualty to each ambulance using Haversine formula",
+                "Filter ambulances within radius",
+                "Sort by distance",
+                "Return nearest ambulance"
+              ],
+              "response": {
+                "success": true,
+                "ambulance": "nearest ambulance object",
+                "distance": "distance in km"
+              }
+            },
+            {
+              "method": "POST",
+              "path": "/api/ambulances/:name/assign",
+              "description": "Assign ambulance to casualty",
+              "request_body": {
+                "casualtyId": "submission or accident ID",
+                "casualtyLocation": {
+                  "latitude": "number",
+                  "longitude": "number"
+                }
+              },
+              "logic": [
+                "Update ambulance status to 'busy'",
+                "Set currentCasualtyId",
+                "Update submission/accident assignedAmbulance field",
+                "Calculate route (return casualty coordinates for now)"
+              ],
+              "response": {
+                "success": true,
+                "route": {
+                  "destination": "casualty location",
+                  "latitude": "number",
+                  "longitude": "number"
+                }
+              }
+            },
+            {
+              "method": "PUT",
+              "path": "/api/ambulances/:name/location",
+              "description": "Update ambulance location (real-time tracking)",
+              "request_body": {
+                "latitude": "number",
+                "longitude": "number"
+              },
+              "logic": "Update ambulance coordinates in ambulances.json",
+              "response": {
+                "success": true,
+                "message": "Location updated"
+              }
+            },
+            {
+              "method": "GET",
+              "path": "/api/ambulances/:name/active-cases",
+              "description": "Get active cases for ambulance (nearest pending casualty)",
+              "logic": [
+                "Get ambulance details",
+                "If status is 'busy', return current casualty",
+                "If status is 'active', find nearest pending submission/accident",
+                "Return only ONE nearest case"
+              ],
+              "response": {
+                "success": true,
+                "case": "casualty object or null"
+              }
+            }
+          ],
+          "validation": "Ambulance assignment and tracking working"
+        },
+        {
+          "task_id": "4.3",
+          "description": "Create utility for distance calculation",
+          "deliverables": [
+            "backend/src/utils/geoUtils.js"
+          ],
+          "functions_required": [
+            "calculateDistance(lat1, lon1, lat2, lon2) - Haversine formula returns km",
+            "findNearest(origin, locations) - finds nearest location from array",
+            "isWithinRadius(point1, point2, radiusKm) - checks if within radius"
+          ],
+          "validation": "Distance calculations accurate"
+        },
+        {
+          "task_id": "4.4",
+          "description": "Create routes for submissions and ambulances",
+          "deliverables": [
+            "backend/src/routes/submissionRoutes.js",
+            "backend/src/routes/ambulanceRoutes.js"
+          ],
+          "validation": "All routes working"
+        }
+      ]
+    },
+    {
+      "phase": 5,
+      "name": "Casualty Reporting & Hospital Assignment",
+      "tasks": [
+        {
+          "task_id": "5.1",
+          "description": "Create casualty reporting endpoint",
+          "deliverables": [
+            "backend/src/controllers/casualtyController.js"
+          ],
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/casualties/report",
+              "description": "Ambulance reports casualties at scene",
+              "request_body": {
+                "ambulanceName": "ambulance ID",
+                "accidentId": "submission/accident ID",
+                "casualties": [
+                  {
+                    "bloodType": "A+, B-, etc",
+                    "bloodRequired": "liters needed",
+                    "severity": "critical/urgent/stable",
+                    "specialtyRequired": "Cardiologist, etc"
+                  }
+                ]
+              },
+              "logic": [
+                "Generate unique IDs for each casualty",
+                "Save all casualties to casualties.json",
+                "Link casualties to accidentId",
+                "Return casualty IDs"
+              ],
+              "response": {
+                "success": true,
+                "casualties": "array of created casualty objects with IDs"
+              }
+            }
+          ],
+          "validation": "Casualty reporting working"
+        },
+        {
+          "task_id": "5.2",
+          "description": "Create hospital matching algorithm",
+          "deliverables": [
+            "backend/src/controllers/hospitalController.js",
+            "backend/src/utils/hospitalMatcher.js"
+          ],
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/hospitals/find-optimal",
+              "description": "Find optimal hospital for casualties",
+              "request_body": {
+                "ambulanceLocation": {
+                  "latitude": "number",
+                  "longitude": "number"
+                },
+                "casualties": [
+                  {
+                    "bloodType": "string",
+                    "bloodRequired": "number",
+                    "severity": "string",
+                    "specialtyRequired": "string"
+                  }
+                ]
+              },
+              "logic": [
+                "Get all hospitals",
+                "For each hospital calculate score based on:",
+                "  - Distance from ambulance (closer = better)",
+                "  - Blood availability (has required types and amounts)",
+                "  - Specialist availability (has required specialists)",
+                "  - Beds available",
+                "Score formula: bloodMatch (40%) + specialistMatch (30%) + distanceScore (20%) + bedScore (10%)",
+                "Return hospital with highest score"
+              ],
+              "response": {
+                "success": true,
+                "hospital": "optimal hospital object",
+                "distance": "distance in km",
+                "route": {
+                  "destination": "hospital location",
+                  "latitude": "number",
+                  "longitude": "number"
+                },
+                "matchDetails": {
+                  "bloodAvailability": "boolean",
+                  "specialistAvailable": "boolean",
+                  "bedsAvailable": "number"
+                }
+              }
+            },
+            {
+              "method": "GET",
+              "path": "/api/hospitals",
+              "description": "Get all hospitals",
+              "response": "Array of hospitals (without passwords)"
+            },
+            {
+              "method": "GET",
+              "path": "/api/hospitals/:id",
+              "description": "Get hospital by ID",
+              "response": "Hospital object (without password)"
+            }
+          ],
+          "validation": "Hospital matching returns sensible results"
+        },
+        {
+          "task_id": "5.3",
+          "description": "Create ambulance arrival and completion endpoint",
+          "deliverables": [
+            "Update backend/src/controllers/ambulanceController.js"
+          ],
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/ambulances/:name/arrived-hospital",
+              "description": "Ambulance marks arrival at hospital",
+              "request_body": {
+                "hospitalId": "number",
+                "casualties": "array of casualty IDs delivered"
+              },
+              "logic": [
+                "Update ambulance status to 'active'",
+                "Clear currentCasualtyId",
+                "Update casualties status to 'transported'",
+                "Update hospital blood inventory (subtract used blood)",
+                "Add ambulance to hospital's incomingAmbulances (remove after delivery)"
+              ],
+              "response": {
+                "success": true,
+                "message": "Delivery completed, ambulance now active"
+              }
+            }
+          ],
+          "validation": "Ambulance status updates correctly"
+        },
+        {
+          "task_id": "5.4",
+          "description": "Create hospital routes",
+          "deliverables": [
+            "backend/src/routes/hospitalRoutes.js"
+          ],
+          "validation": "Hospital routes working"
+        }
+      ]
+    },
+    {
+      "phase": 6,
+      "name": "Scenario 2 - Ambulance Receives Call",
+      "tasks": [
+        {
+          "task_id": "6.1",
+          "description": "Create manual call reporting endpoint",
+          "deliverables": [
+            "Update backend/src/controllers/ambulanceController.js"
+          ],
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/ambulances/:name/manual-call",
+              "description": "Ambulance driver manually reports receiving a call",
+              "request_body": {
+                "location": "address string",
+                "latitude": "number",
+                "longitude": "number",
+                "description": "brief description"
+              },
+              "logic": [
+                "Create new entry in submissions.json with call details",
+                "Also create in active_accidents.json",
+                "Automatically assign this ambulance to the case",
+                "Set ambulance status to 'busy'",
+                "Return case details and route"
+              ],
+              "response": {
+                "success": true,
+                "caseId": "generated ID",
+                "route": {
+                  "destination": "casualty location",
+                  "latitude": "number",
+                  "longitude": "number"
+                }
+              }
+            }
+          ],
+          "note": "After this, the flow is same as scenario 1: report casualties, find hospital, deliver, mark complete",
+          "validation": "Manual call reporting creates case and assigns ambulance"
+        }
+      ]
+    },
+    {
+      "phase": 7,
+      "name": "Scenario 3 - Inter-Hospital Blood Transfer",
+      "tasks": [
+        {
+          "task_id": "7.1",
+          "description": "Create blood request system",
+          "deliverables": [
+            "backend/src/controllers/bloodRequestController.js"
+          ],
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/blood-requests/create",
+              "description": "Hospital requests blood from another hospital",
+              "request_body": {
+                "fromHospitalId": "requesting hospital ID",
+                "bloodType": "A+, B-, etc",
+                "litersNeeded": "number",
+                "reason": "optional description"
+              },
+              "logic": [
+                "Find nearest hospital with required blood type and amount",
+                "Check if within reasonable distance (e.g., 50km)",
+                "Create blood request with status 'pending'",
+                "Add to blood_requests.json",
+                "Add to target hospital's bloodRequests array in hospitals.json"
+              ],
+              "response": {
+                "success": true,
+                "request": "blood request object",
+                "targetHospital": "hospital that has the blood"
+              }
+            },
+            {
+              "method": "POST",
+              "path": "/api/blood-requests/:requestId/approve",
+              "description": "Hospital approves blood transfer request",
+              "request_body": {
+                "hospitalId": "approving hospital ID"
+              },
+              "logic": [
+                "Update request status to 'approved'",
+                "Find nearest available ambulance to approving hospital",
+                "Assign ambulance to blood transfer",
+                "Calculate route: approving hospital -> requesting hospital",
+                "Update ambulance status to 'busy'",
+                "Reduce blood inventory at approving hospital"
+              ],
+              "response": {
+                "success": true,
+                "ambulance": "assigned ambulance",
+                "route": {
+                  "from": "approving hospital location",
+                  "to": "requesting hospital location"
+                }
+              }
+            },
+            {
+              "method": "POST",
+              "path": "/api/blood-requests/:requestId/reject",
+              "description": "Hospital rejects blood transfer request",
+              "request_body": {
+                "hospitalId": "rejecting hospital ID",
+                "reason": "optional reason"
+              },
+              "logic": [
+                "Update request status to 'rejected'",
+                "Remove from hospital's pending requests"
+              ],
+              "response": {
+                "success": true,
+                "message": "Request rejected"
+              }
+            },
+            {
+              "method": "POST",
+              "path": "/api/blood-requests/:requestId/complete",
+              "description": "Mark blood transfer as completed",
+              "request_body": {
+                "ambulanceName": "ambulance that delivered"
+              },
+              "logic": [
+                "Update request status to 'completed'",
+                "Add blood to requesting hospital inventory",
+                "Update ambulance status to 'active'",
+                "Clear ambulance assignment"
+              ],
+              "response": {
+                "success": true,
+                "message": "Blood transfer completed"
+              }
+            },
+            {
+              "method": "GET",
+              "path": "/api/hospitals/:id/blood-requests",
+              "description": "Get pending blood requests for a hospital",
+              "response": {
+                "success": true,
+                "requests": "array of pending blood requests"
+              }
+            }
+          ],
+          "validation": "Blood request flow working end-to-end"
+        },
+        {
+          "task_id": "7.2",
+          "description": "Create blood request routes",
+          "deliverables": [
+            "backend/src/routes/bloodRequestRoutes.js"
+          ],
+          "validation": "Routes connected"
+        }
+      ]
+    },
+    {
+      "phase": 8,
+      "name": "Hospital Dashboard Data",
+      "tasks": [
+        {
+          "task_id": "8.1",
+          "description": "Create hospital dashboard endpoints",
+          "deliverables": [
+            "Update backend/src/controllers/hospitalController.js"
+          ],
+          "endpoints": [
+            {
+              "method": "GET",
+              "path": "/api/hospitals/:id/dashboard",
+              "description": "Get comprehensive dashboard data for hospital",
+              "response": {
+                "success": true,
+                "hospital": "hospital details",
+                "incomingAmbulances": "array of ambulances heading to this hospital",
+                "bloodRequests": "pending blood requests",
+                "stats": {
+                  "totalBeds": "number",
+                  "availableBeds": "number",
+                  "totalBlood": "total liters",
+                  "ambulancesIncoming": "count"
+                }
+              }
+            },
+            {
+              "method": "PUT",
+              "path": "/api/hospitals/:id/update-inventory",
+              "description": "Manually update hospital blood inventory",
+              "request_body": {
+                "bloodType": "A+, B-, etc",
+                "liters": "number to add/subtract (positive or negative)"
+              },
+              "logic": "Update specific blood type inventory",
+              "response": {
+                "success": true,
+                "updatedInventory": "new blood inventory object"
+              }
+            }
+          ],
+          "validation": "Dashboard data returns correctly"
+        }
+      ]
+    },
+    {
+      "phase": 9,
+      "name": "Integration & Testing",
+      "tasks": [
+        {
+          "task_id": "9.1",
+          "description": "Update main server to include all routes",
+          "deliverables": [
+            "Update backend/src/server.js"
+          ],
+          "routes_to_include": [
+            "/api/auth -> authRoutes",
+            "/api/submissions -> submissionRoutes",
+            "/api/ambulances -> ambulanceRoutes",
+            "/api/casualties -> casualtyRoutes (new file)",
+            "/api/hospitals -> hospitalRoutes",
+            "/api/blood-requests -> bloodRequestRoutes"
+          ],
+          "validation": "All routes accessible"
+        },
+        {
+          "task_id": "9.2",
+          "description": "Create API documentation file",
+          "deliverables": [
+            "backend/API_DOCUMENTATION.md"
+          ],
+          "content": "Document all endpoints with request/response examples",
+          "validation": "Documentation complete"
+        },
+        {
+          "task_id": "9.3",
+          "description": "Create startup instructions",
+          "deliverables": [
+            "backend/README.md"
+          ],
+          "content": [
+            "Installation steps",
+            "How to run the server",
+            "Environment variables needed",
+            "API endpoint overview",
+            "Frontend integration notes"
+          ],
+          "validation": "README clear and complete"
+        }
+      ]
+    },
+    {
+      "phase": 10,
+      "name": "Frontend Integration Guide",
+      "tasks": [
+        {
+          "task_id": "10.1",
+          "description": "Create frontend integration file",
+          "deliverables": [
+            "backend/FRONTEND_INTEGRATION.md"
+          ],
+          "content": {
+            "api_base_url": "http://localhost:5000 (configurable)",
+            "scenario_1_flow": [
+              "Guest submits accident: POST /api/submissions",
+              "Frontend polls: GET /api/ambulances/nearest?lat=X&lng=Y",
+              "Assign ambulance: POST /api/ambulances/{name}/assign",
+              "Ambulance updates location: PUT /api/ambulances/{name}/location",
+              "Ambulance reports casualties: POST /api/casualties/report",
+              "Find hospital: POST /api/hospitals/find-optimal",
+              "Complete delivery: POST /api/ambulances/{name}/arrived-hospital"
+            ],
+            "scenario_2_flow": [
+              "Ambulance gets call: POST /api/ambulances/{name}/manual-call",
+              "Then follow same flow as scenario 1 from casualty reporting"
+            ],
+            "scenario_3_flow": [
+              "Hospital needs blood: POST /api/blood-requests/create",
+              "Target hospital sees request: GET /api/hospitals/{id}/blood-requests",
+              "Approve request: POST /api/blood-requests/{requestId}/approve",
+              "Ambulance delivers: POST /api/blood-requests/{requestId}/complete"
+            ],
+            "replacing_local_json": "Replace api.js fetch calls to local JSON with fetch to backend API endpoints"
+          },
+          "validation": "Integration guide clear"
+        },
+        {
+          "task_id": "10.2",
+          "description": "Create sample api.js for frontend",
+          "deliverables": [
+            "backend/sample-frontend-api.js"
+          ],
+          "content": "JavaScript file showing how to replace local JSON calls with API calls",
+          "validation": "Sample code provided"
+        }
+      ]
+    }
+  ],
+  
+  "critical_requirements": {
+    "data_persistence": "Use JSON files for all data storage",
+    "authentication": "Simple password matching, no hashing required",
+    "password_storage": "Passwords stored in same JSON files as other data",
+    "distance_calculation": "Use Haversine formula for accuracy",
+    "hospital_matching": "Weighted scoring based on blood, specialists, distance, beds",
+    "ambulance_visibility": "Busy ambulances not shown to other accidents",
+    "real_time_updates": "Ambulance location updates frequently",
+    "error_handling": "All endpoints must have try-catch and return proper error messages"
+  },
+  
+  "success_criteria": {
+    "scenario_1": "Guest can report accident, ambulance gets assigned, reports casualties, hospital chosen, delivery completed",
+    "scenario_2": "Ambulance can manually log call and follow same flow",
+    "scenario_3": "Hospital can request blood, another hospital approves, ambulance delivers",
+    "data_integrity": "All JSON files maintain correct structure",
+    "api_responses": "All endpoints return consistent JSON format {success, data/error, message}",
+    "frontend_compatible": "API responses match what frontend expects"
+  },
+  
+  "execution_notes": {
+    "approach": "Build one phase at a time",
+    "testing": "Test each endpoint after creation",
+    "validation": "Verify JSON data updates correctly",
+    "missing_data_handling": "If critical data missing from provided JSON, AI should add reasonable defaults",
+    "sample_data": "Create 5-8 ambulances, 3-5 hospitals minimum for testing"
+  }
+}

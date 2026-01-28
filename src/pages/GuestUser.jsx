@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { reportAccident } from "../services/api";
 
 function GuestUser() {
   const navigate = useNavigate();
@@ -15,8 +16,6 @@ function GuestUser() {
 
   const userAvatarUrl =
     "https://lh3.googleusercontent.com/aida-public/AB6AXuAznK4Z6bAxZgs6fcy-L7t74V4PiEJ370LX_cCud0cr1VAc-o85wtbdeYFkWUGW10giLXaykhB_FlGKTV3iyz0PKJXRVrQ_rZcGWI-cwre6-yDLpWYagksKCsfl3nd67fFcdVWT7U-Jpa6Tl_l1Q9fHmut1hLpytx4-6eRhzAsihyrNG5IHPoQ9oukaQkyNRfgFes0jM4gnceJ2V7xjfh5xR4M3WkPMGd_JSgexHtXMRrZLnGSP0FUI3Ibt1GwPjrTioOKZ30ZQ9ms";
-
-  const API_ENDPOINT = "";
 
   // Check if we're in a secure context (required for camera/location)
   const isSecureContext = window.isSecureContext;
@@ -143,36 +142,29 @@ function GuestUser() {
     setLoading(true);
 
     try {
-      // Create submission object
-      const submission = {
-        id: `SUB-${Date.now()}`,
+      // Report accident via API
+      const result = await reportAccident({
         image: capturedImage,
-        location: location,
-        timestamp: new Date().toISOString(),
+        latitude: location.latitude,
+        longitude: location.longitude,
+        accuracy: location.accuracy,
         userAgent: navigator.userAgent,
-      };
+      });
 
-      // Save to submissions.json via API
-      if (API_ENDPOINT) {
-        await fetch(`${API_ENDPOINT}/submissions`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(submission),
-        });
+      if (result.success) {
+        setSubmitted(true);
+        setLoading(false);
+
+        // Reset after 3 seconds
+        setTimeout(() => {
+          setCapturedImage(null);
+          setLocation(null);
+          setSubmitted(false);
+        }, 3000);
       } else {
-        // For now, just log it (API not configured)
-        console.log("Submission would be sent:", submission);
+        setError(result.error || "Failed to submit accident report.");
+        setLoading(false);
       }
-
-      setSubmitted(true);
-      setLoading(false);
-
-      // Reset after 3 seconds
-      setTimeout(() => {
-        setCapturedImage(null);
-        setLocation(null);
-        setSubmitted(false);
-      }, 3000);
     } catch (err) {
       setError("Error submitting photo: " + err.message);
       setLoading(false);
@@ -189,54 +181,60 @@ function GuestUser() {
 
   return (
     <div className="bg-slate-50 text-slate-900 min-h-screen">
-      <div className="max-w-lg mx-auto flex flex-col h-screen">
+      <div className="max-w-lg mx-auto flex flex-col min-h-screen">
         {/* Header */}
-        <header className="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between shrink-0 shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary p-2 rounded-lg text-white">
-              <span className="material-symbols-outlined">photo_camera</span>
+        <header className="h-14 sm:h-16 border-b border-slate-200 bg-white px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-sm">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="bg-primary p-1.5 sm:p-2 rounded-lg text-white">
+              <span className="material-symbols-outlined text-lg sm:text-xl">
+                photo_camera
+              </span>
             </div>
             <div>
-              <h1 className="text-primary font-bold text-sm">Photo Capture</h1>
-              <p className="text-slate-500 text-xs">
+              <h1 className="text-primary font-bold text-xs sm:text-sm">
+                Photo Capture
+              </h1>
+              <p className="text-slate-500 text-[10px] sm:text-xs">
                 Mobile Evidence Collection
               </p>
             </div>
           </div>
           <div
-            className="h-8 w-8 rounded-full bg-cover bg-center border border-slate-200"
+            className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-cover bg-center border border-slate-200"
             style={{ backgroundImage: `url('${userAvatarUrl}')` }}
             title="User profile avatar"
           ></div>
         </header>
 
         {/* Main Content */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-700 text-sm font-medium">{error}</p>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
+              <p className="text-red-700 text-xs sm:text-sm font-medium">
+                {error}
+              </p>
             </div>
           )}
 
           {locationError && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <p className="text-yellow-700 text-sm font-medium">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 sm:p-4">
+              <p className="text-yellow-700 text-xs sm:text-sm font-medium">
                 {locationError}
               </p>
             </div>
           )}
 
           {submitted && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 animate-pulse">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-green-600">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 animate-pulse">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="material-symbols-outlined text-green-600 text-lg sm:text-xl">
                   check_circle
                 </span>
                 <div>
-                  <p className="text-green-700 font-bold">
+                  <p className="text-green-700 font-bold text-sm sm:text-base">
                     Submitted Successfully!
                   </p>
-                  <p className="text-green-600 text-xs">
+                  <p className="text-green-600 text-[10px] sm:text-xs">
                     Photo and location saved
                   </p>
                 </div>
@@ -274,20 +272,20 @@ function GuestUser() {
           {!capturedImage && (
             <button
               onClick={capturePhoto}
-              className="w-full bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white font-bold py-4 px-6 rounded-lg transition-all flex items-center justify-center gap-3 shadow-lg shadow-primary/25"
+              className="w-full bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white font-bold py-3 sm:py-4 px-4 sm:px-6 rounded-lg transition-all flex items-center justify-center gap-2 sm:gap-3 shadow-lg shadow-primary/25"
             >
-              <span className="material-symbols-outlined text-2xl">
+              <span className="material-symbols-outlined text-xl sm:text-2xl">
                 photo_camera
               </span>
-              <span>Capture Photo</span>
+              <span className="text-sm sm:text-base">Capture Photo</span>
             </button>
           )}
 
           {/* Location Status */}
-          <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-slate-900 font-bold text-sm flex items-center gap-2">
-                <span className="material-symbols-outlined text-primary">
+          <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <h3 className="text-slate-900 font-bold text-xs sm:text-sm flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-base sm:text-lg">
                   location_on
                 </span>
                 Location Information
@@ -298,20 +296,20 @@ function GuestUser() {
             </div>
 
             {location ? (
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between p-2 bg-slate-50 rounded">
+              <div className="space-y-1.5 sm:space-y-2 text-[11px] sm:text-xs">
+                <div className="flex justify-between p-1.5 sm:p-2 bg-slate-50 rounded">
                   <span className="text-slate-600">Latitude:</span>
                   <span className="font-mono font-bold text-primary">
                     {location.latitude.toFixed(6)}
                   </span>
                 </div>
-                <div className="flex justify-between p-2 bg-slate-50 rounded">
+                <div className="flex justify-between p-1.5 sm:p-2 bg-slate-50 rounded">
                   <span className="text-slate-600">Longitude:</span>
                   <span className="font-mono font-bold text-primary">
                     {location.longitude.toFixed(6)}
                   </span>
                 </div>
-                <div className="flex justify-between p-2 bg-slate-50 rounded">
+                <div className="flex justify-between p-1.5 sm:p-2 bg-slate-50 rounded">
                   <span className="text-slate-600">Accuracy:</span>
                   <span className="font-mono font-bold text-primary">
                     ±{location.accuracy.toFixed(1)}m
@@ -319,20 +317,22 @@ function GuestUser() {
                 </div>
               </div>
             ) : (
-              <p className="text-slate-500 text-xs">
+              <p className="text-slate-500 text-[11px] sm:text-xs">
                 Location not yet captured. Click below to enable.
               </p>
             )}
           </div>
 
           {/* Action Buttons */}
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {!location && (
               <button
                 onClick={requestLocation}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2 shadow-md"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-all flex items-center justify-center gap-2 shadow-md text-sm"
               >
-                <span className="material-symbols-outlined">my_location</span>
+                <span className="material-symbols-outlined text-lg">
+                  my_location
+                </span>
                 <span>Enable Location Access</span>
               </button>
             )}
@@ -341,9 +341,9 @@ function GuestUser() {
               <button
                 onClick={submitCapture}
                 disabled={loading}
-                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-slate-400 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2 shadow-md"
+                className="w-full bg-green-600 hover:bg-green-700 disabled:bg-slate-400 text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-all flex items-center justify-center gap-2 shadow-md text-sm"
               >
-                <span className="material-symbols-outlined">
+                <span className="material-symbols-outlined text-lg">
                   {loading ? "hourglass_top" : "cloud_upload"}
                 </span>
                 <span>
@@ -355,23 +355,25 @@ function GuestUser() {
             {capturedImage && (
               <button
                 onClick={resetCapture}
-                className="w-full bg-slate-300 hover:bg-slate-400 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2"
+                className="w-full bg-slate-300 hover:bg-slate-400 text-slate-900 font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-all flex items-center justify-center gap-2 text-sm"
               >
-                <span className="material-symbols-outlined">refresh</span>
+                <span className="material-symbols-outlined text-lg">
+                  refresh
+                </span>
                 <span>Retake Photo</span>
               </button>
             )}
           </div>
 
           {/* Info Section */}
-          <div className="bg-slate-100 rounded-lg p-4 text-xs text-slate-600 space-y-2">
+          <div className="bg-slate-100 rounded-lg p-3 sm:p-4 text-[11px] sm:text-xs text-slate-600 space-y-2">
             <div className="flex gap-2">
               <span className="material-symbols-outlined text-sm text-primary shrink-0">
                 info
               </span>
               <div>
                 <p className="font-bold text-slate-900 mb-1">How it works:</p>
-                <ol className="list-decimal list-inside space-y-1">
+                <ol className="list-decimal list-inside space-y-0.5 sm:space-y-1">
                   <li>Click "Capture Photo" to take a picture</li>
                   <li>Enable location access to capture GPS coordinates</li>
                   <li>Click "Submit" to save both photo and location</li>

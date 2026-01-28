@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { getHospitalByName } from "../../services/api";
 
 function HospitalDashboard() {
   const navigate = useNavigate();
   const [hospital, setHospital] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const userAvatarUrl =
     "https://lh3.googleusercontent.com/aida-public/AB6AXuAznK4Z6bAxZgs6fcy-L7t74V4PiEJ370LX_cCud0cr1VAc-o85wtbdeYFkWUGW10giLXaykhB_FlGKTV3iyz0PKJXRVrQ_rZcGWI-cwre6-yDLpWYagksKCsfl3nd67fFcdVWT7U-Jpa6Tl_l1Q9fHmut1hLpytx4-6eRhzAsihyrNG5IHPoQ9oukaQkyNRfgFes0jM4gnceJ2V7xjfh5xR4M3WkPMGd_JSgexHtXMRrZLnGSP0FUI3Ibt1GwPjrTioOKZ30ZQ9ms";
@@ -17,22 +19,29 @@ function HospitalDashboard() {
     navigate("/", { replace: true });
   };
 
-  // Load hospital data from JSON based on localStorage userName
+  // Load hospital data from API based on localStorage userName
   useEffect(() => {
     const loadHospitalData = async () => {
       try {
-        const response = await fetch("/hospitals.json");
-        const data = await response.json();
         // Get hospital name from localStorage (set during login)
         const userName = localStorage.getItem("userName");
-        const selectedHospital = data.hospitals.find(
-          (h) => h.name === userName,
-        );
-
-        if (!selectedHospital) {
-          setError("Hospital not found");
+        
+        // Try to get from localStorage first (set during login)
+        const cachedData = localStorage.getItem("hospitalData");
+        if (cachedData) {
+          setHospital(JSON.parse(cachedData));
+          setLoading(false);
+          return;
+        }
+        
+        // Otherwise fetch from API
+        const result = await getHospitalByName(userName);
+        
+        if (result.success && result.data) {
+          setHospital(result.data);
+          localStorage.setItem("hospitalData", JSON.stringify(result.data));
         } else {
-          setHospital(selectedHospital);
+          setError("Hospital not found");
         }
         setLoading(false);
       } catch (err) {
@@ -63,24 +72,45 @@ function HospitalDashboard() {
   return (
     <div className="Main bg-slate-50 text-slate-900">
       <div className="flex h-screen overflow-hidden">
-        <aside className="w-64 border-r border-slate-200 bg-white flex flex-col shrink-0">
-          <div className="p-6 border-b border-slate-200 flex items-center gap-3">
+        {/* Mobile sidebar overlay */}
+        {sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+        
+        {/* Sidebar */}
+        <aside className={`
+          fixed lg:static inset-y-0 left-0 z-50
+          w-64 border-r border-slate-200 bg-white flex flex-col shrink-0
+          transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}>
+          <div className="p-4 sm:p-6 border-b border-slate-200 flex items-center gap-3">
             <div className="bg-primary p-2 rounded-lg text-white">
               <span className="material-symbols-outlined block">emergency</span>
             </div>
-            <div>
-              <h1 className="text-primary text-sm font-bold leading-tight">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-primary text-sm font-bold leading-tight truncate">
                 {hospital.name}
               </h1>
               <p className="text-slate-500 text-xs font-medium">
                 Emergency Hub
               </p>
             </div>
+            <button 
+              className="lg:hidden p-1 hover:bg-slate-100 rounded"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
           </div>
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             <Link
               to="/hospital"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary text-white"
+              onClick={() => setSidebarOpen(false)}
             >
               <span className="material-symbols-outlined">dashboard</span>
               <span className="text-sm font-medium">Dashboard</span>
@@ -88,6 +118,7 @@ function HospitalDashboard() {
             <Link
               to="/hospital/inventory"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100"
+              onClick={() => setSidebarOpen(false)}
             >
               <span className="material-symbols-outlined">inventory_2</span>
               <span className="text-sm font-medium">Inventory</span>
@@ -95,6 +126,7 @@ function HospitalDashboard() {
             <Link
               to="/hospital/fleet"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100"
+              onClick={() => setSidebarOpen(false)}
             >
               <span className="material-symbols-outlined">ambulance</span>
               <span className="text-sm font-medium">Fleet Management</span>
@@ -102,6 +134,7 @@ function HospitalDashboard() {
             <Link
               to="/hospital/staff"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100"
+              onClick={() => setSidebarOpen(false)}
             >
               <span className="material-symbols-outlined">group</span>
               <span className="text-sm font-medium">Staffing</span>
@@ -118,9 +151,15 @@ function HospitalDashboard() {
           </div>
         </aside>
         <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <header className="h-16 border-b border-slate-200 bg-white px-8 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-6 flex-1">
-              <h2 className="text-primary text-lg font-bold">
+          <header className="h-14 sm:h-16 border-b border-slate-200 bg-white px-4 sm:px-8 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-3 sm:gap-6 flex-1">
+              <button 
+                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg"
+                onClick={() => setSidebarOpen(true)}
+              >
+                <span className="material-symbols-outlined">menu</span>
+              </button>
+              <h2 className="text-primary text-base sm:text-lg font-bold truncate">
                 Hospital Resource Management
               </h2>
             </div>
@@ -132,11 +171,11 @@ function HospitalDashboard() {
               ></div>
             </div>
           </header>
-          <div className="flex-1 overflow-y-auto p-8 bg-slate-50 space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50 space-y-6 sm:space-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="bg-blue-50 p-4 sm:p-6 rounded-xl border border-blue-200">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-blue-600 font-bold text-sm uppercase tracking-wider">
+                  <h3 className="text-blue-600 font-bold text-xs sm:text-sm uppercase tracking-wider">
                     Beds Available
                   </h3>
                   <span className="material-symbols-outlined text-blue-600">
@@ -144,7 +183,7 @@ function HospitalDashboard() {
                   </span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-slate-900">
+                  <span className="text-2xl sm:text-3xl font-bold text-slate-900">
                     {hospital.bedsAvailable}
                   </span>
                 </div>
@@ -152,9 +191,9 @@ function HospitalDashboard() {
                   Total beds in facility
                 </p>
               </div>
-              <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
+              <div className="bg-blue-50 p-4 sm:p-6 rounded-xl border border-blue-200">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-blue-600 font-bold text-sm uppercase tracking-wider">
+                  <h3 className="text-blue-600 font-bold text-xs sm:text-sm uppercase tracking-wider">
                     Blood Inventory
                   </h3>
                   <span className="material-symbols-outlined text-blue-600">
@@ -162,7 +201,7 @@ function HospitalDashboard() {
                   </span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-slate-900">
+                  <span className="text-2xl sm:text-3xl font-bold text-slate-900">
                     {hospital.bloodInventory.total.toLocaleString()}
                   </span>
                 </div>
@@ -170,9 +209,9 @@ function HospitalDashboard() {
                   Units across all types
                 </p>
               </div>
-              <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
+              <div className="bg-blue-50 p-4 sm:p-6 rounded-xl border border-blue-200 sm:col-span-2 lg:col-span-1">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-blue-600 font-bold text-sm uppercase tracking-wider">
+                  <h3 className="text-blue-600 font-bold text-xs sm:text-sm uppercase tracking-wider">
                     Active Specialists
                   </h3>
                   <span className="material-symbols-outlined text-blue-600">
@@ -180,7 +219,7 @@ function HospitalDashboard() {
                   </span>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-slate-900">
+                  <span className="text-2xl sm:text-3xl font-bold text-slate-900">
                     {
                       Object.values(hospital.staffCount).filter(
                         (count) => count > 0,
@@ -193,48 +232,50 @@ function HospitalDashboard() {
                 </p>
               </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-8">
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 sm:gap-8">
+              <div className="xl:col-span-2 space-y-6 sm:space-y-8">
                 <section className="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                  <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-                    <h3 className="text-slate-900 font-bold">
+                  <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <h3 className="text-slate-900 font-bold text-sm sm:text-base">
                       Blood Type Inventory
                     </h3>
-                    <button className="text-blue-600 text-xs font-bold uppercase hover:underline">
+                    <button className="text-blue-600 text-xs font-bold uppercase hover:underline self-start sm:self-auto">
                       Export Data
                     </button>
                   </div>
-                  <table className="w-full text-left text-sm">
-                    <thead className="bg-slate-100 text-slate-700 uppercase text-[10px] font-bold">
-                      <tr>
-                        <th className="px-6 py-3">Blood Type</th>
-                        <th className="px-6 py-3">In-Stock (Liters)</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200">
-                      {hospital.bloodInventory.bloodTypes.map(
-                        (blood, index) => (
-                          <tr key={index} className="hover:bg-slate-50">
-                            <td className="px-6 py-4 font-bold text-blue-600">
-                              {blood.type}
-                            </td>
-                            <td className="px-6 py-4">{blood.liters} Liters</td>
-                          </tr>
-                        ),
-                      )}
-                    </tbody>
-                  </table>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm min-w-75">
+                      <thead className="bg-slate-100 text-slate-700 uppercase text-[10px] font-bold">
+                        <tr>
+                          <th className="px-4 sm:px-6 py-3">Blood Type</th>
+                          <th className="px-4 sm:px-6 py-3">In-Stock (Liters)</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-200">
+                        {hospital.bloodInventory.bloodTypes.map(
+                          (blood, index) => (
+                            <tr key={index} className="hover:bg-slate-50">
+                              <td className="px-4 sm:px-6 py-3 sm:py-4 font-bold text-blue-600">
+                                {blood.type}
+                              </td>
+                              <td className="px-4 sm:px-6 py-3 sm:py-4">{blood.liters} Liters</td>
+                            </tr>
+                          ),
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </section>
               </div>
               <aside className="space-y-6">
                 <section className="bg-white rounded-xl border border-slate-200 h-fit overflow-hidden">
-                  <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
-                    <h3 className="text-slate-900 font-bold">
+                  <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-200 flex items-center justify-between">
+                    <h3 className="text-slate-900 font-bold text-sm sm:text-base">
                       Incoming Ambulances
                     </h3>
                     <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
                   </div>
-                  <div className="p-4 space-y-3">
+                  <div className="p-3 sm:p-4 space-y-3">
                     {hospital.incomingAmbulances &&
                       hospital.incomingAmbulances.map((ambulance, index) => (
                         <div
@@ -248,12 +289,12 @@ function HospitalDashboard() {
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex items-center gap-2">
                               <div
-                                className={`p-2 rounded-lg ${
+                                className={`p-1.5 sm:p-2 rounded-lg ${
                                   index === 0 ? "bg-red-200" : "bg-blue-200"
                                 }`}
                               >
                                 <span
-                                  className={`material-symbols-outlined text-lg ${
+                                  className={`material-symbols-outlined text-base sm:text-lg ${
                                     index === 0
                                       ? "text-red-600"
                                       : "text-blue-600"
@@ -264,7 +305,7 @@ function HospitalDashboard() {
                               </div>
                               <div>
                                 <p
-                                  className={`text-sm font-bold ${
+                                  className={`text-xs sm:text-sm font-bold ${
                                     index === 0
                                       ? "text-red-600"
                                       : "text-blue-600"
@@ -298,6 +339,7 @@ function HospitalDashboard() {
                                 className={`text-xs font-bold ${
                                   index === 0 ? "text-red-600" : "text-blue-600"
                                 }`}
+                              >
                               >
                                 {ambulance.progress}%
                               </span>

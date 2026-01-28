@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { getHospitalByName, updateBloodInventory } from "../../services/api";
 
 function HospitalInventory() {
   const navigate = useNavigate();
@@ -7,12 +8,10 @@ function HospitalInventory() {
   const [inventoryData, setInventoryData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const userAvatarUrl =
     "https://lh3.googleusercontent.com/aida-public/AB6AXuAznK4Z6bAxZgs6fcy-L7t74V4PiEJ370LX_cCud0cr1VAc-o85wtbdeYFkWUGW10giLXaykhB_FlGKTV3iyz0PKJXRVrQ_rZcGWI-cwre6-yDLpWYagksKCsfl3nd67fFcdVWT7U-Jpa6Tl_l1Q9fHmut1hLpytx4-6eRhzAsihyrNG5IHPoQ9oukaQkyNRfgFes0jM4gnceJ2V7xjfh5xR4M3WkPMGd_JSgexHtXMRrZLnGSP0FUI3Ibt1GwPjrTioOKZ30ZQ9ms";
-
-  // API endpoint placeholder - to be filled later
-  const API_ENDPOINT = "";
 
   const handleLogout = () => {
     localStorage.removeItem("adminAuth");
@@ -21,17 +20,24 @@ function HospitalInventory() {
     navigate("/", { replace: true });
   };
 
-  // Load hospital data from JSON based on localStorage userName
+  // Load hospital data from API based on localStorage userName
   useEffect(() => {
     const loadHospitalData = async () => {
       try {
-        const response = await fetch("/hospitals.json");
-        const data = await response.json();
-        // Get hospital name from localStorage (set during login)
         const userName = localStorage.getItem("userName");
-        const selectedHospital = data.hospitals.find(
-          (h) => h.name === userName,
-        );
+
+        // Try to get from localStorage first (set during login)
+        const cachedData = localStorage.getItem("hospitalData");
+        let selectedHospital = cachedData ? JSON.parse(cachedData) : null;
+
+        // Otherwise fetch from API
+        if (!selectedHospital) {
+          const result = await getHospitalByName(userName);
+          if (result.success && result.data) {
+            selectedHospital = result.data;
+            localStorage.setItem("hospitalData", JSON.stringify(result.data));
+          }
+        }
 
         if (!selectedHospital) {
           setError("Hospital not found");
@@ -39,9 +45,14 @@ function HospitalInventory() {
           setHospital(selectedHospital);
           // Initialize inventory data from hospital bloodInventory
           const inventoryMap = {};
-          selectedHospital.bloodInventory.bloodTypes.forEach((blood) => {
-            inventoryMap[blood.type] = blood.liters;
-          });
+          if (
+            selectedHospital.bloodInventory &&
+            selectedHospital.bloodInventory.bloodTypes
+          ) {
+            selectedHospital.bloodInventory.bloodTypes.forEach((blood) => {
+              inventoryMap[blood.type] = blood.liters;
+            });
+          }
           setInventoryData(inventoryMap);
         }
         setLoading(false);
@@ -76,21 +87,28 @@ function HospitalInventory() {
   };
 
   const handleUpdateInventory = async () => {
-    // POST to API when endpoint is available
-    if (API_ENDPOINT) {
-      try {
-        await fetch(`${API_ENDPOINT}/hospital/${hospital.id}/inventory`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ bloodInventory: inventoryData }),
-        });
+    try {
+      // Convert inventoryData to bloodTypes array format
+      const bloodTypes = Object.entries(inventoryData).map(
+        ([type, liters]) => ({
+          type,
+          liters,
+        }),
+      );
+
+      const result = await updateBloodInventory(hospital.id, bloodTypes);
+
+      if (result.success) {
+        // Update local storage with new data
+        const updatedHospital = { ...hospital, bloodInventory: { bloodTypes } };
+        localStorage.setItem("hospitalData", JSON.stringify(updatedHospital));
         alert("Inventory updated successfully!");
-      } catch (err) {
-        console.error("Error updating inventory:", err);
-        alert("Error updating inventory");
+      } else {
+        alert("Error updating inventory: " + (result.error || "Unknown error"));
       }
-    } else {
-      alert("Inventory updated successfully! (API endpoint not configured)");
+    } catch (err) {
+      console.error("Error updating inventory:", err);
+      alert("Error updating inventory");
     }
   };
 
@@ -113,24 +131,47 @@ function HospitalInventory() {
   return (
     <div className="Main bg-slate-50 text-slate-900">
       <div className="flex h-screen overflow-hidden">
-        <aside className="w-64 border-r border-slate-200 bg-white flex flex-col shrink-0">
-          <div className="p-6 border-b border-slate-200 flex items-center gap-3">
+        {/* Mobile sidebar overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Sidebar */}
+        <aside
+          className={`
+          fixed lg:static inset-y-0 left-0 z-50
+          w-64 border-r border-slate-200 bg-white flex flex-col shrink-0
+          transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        `}
+        >
+          <div className="p-4 sm:p-6 border-b border-slate-200 flex items-center gap-3">
             <div className="bg-primary p-2 rounded-lg text-white">
               <span className="material-symbols-outlined block">emergency</span>
             </div>
-            <div>
-              <h1 className="text-primary text-sm font-bold leading-tight">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-primary text-sm font-bold leading-tight truncate">
                 {hospital.name}
               </h1>
               <p className="text-slate-500 text-xs font-medium">
                 Emergency Hub
               </p>
             </div>
+            <button
+              className="lg:hidden p-1 hover:bg-slate-100 rounded"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <span className="material-symbols-outlined">close</span>
+            </button>
           </div>
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             <Link
               to="/hospital"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100"
+              onClick={() => setSidebarOpen(false)}
             >
               <span className="material-symbols-outlined">dashboard</span>
               <span className="text-sm font-medium">Dashboard</span>
@@ -138,6 +179,7 @@ function HospitalInventory() {
             <Link
               to="/hospital/inventory"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary text-white shadow-md shadow-primary/20"
+              onClick={() => setSidebarOpen(false)}
             >
               <span className="material-symbols-outlined">inventory_2</span>
               <span className="text-sm font-medium">Inventory</span>
@@ -145,6 +187,7 @@ function HospitalInventory() {
             <Link
               to="/hospital/fleet"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100"
+              onClick={() => setSidebarOpen(false)}
             >
               <span className="material-symbols-outlined">ambulance</span>
               <span className="text-sm font-medium">Fleet Management</span>
@@ -152,6 +195,7 @@ function HospitalInventory() {
             <Link
               to="/hospital/staff"
               className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-600 hover:bg-slate-100"
+              onClick={() => setSidebarOpen(false)}
             >
               <span className="material-symbols-outlined">group</span>
               <span className="text-sm font-medium">Staffing</span>
@@ -168,9 +212,15 @@ function HospitalInventory() {
           </div>
         </aside>
         <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <header className="h-16 border-b border-slate-200 bg-white px-8 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-6 flex-1">
-              <h2 className="text-primary text-lg font-bold">
+          <header className="h-14 sm:h-16 border-b border-slate-200 bg-white px-4 sm:px-8 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-3 sm:gap-6 flex-1">
+              <button
+                className="lg:hidden p-2 hover:bg-slate-100 rounded-lg"
+                onClick={() => setSidebarOpen(true)}
+              >
+                <span className="material-symbols-outlined">menu</span>
+              </button>
+              <h2 className="text-primary text-base sm:text-lg font-bold truncate">
                 Blood Inventory Management
               </h2>
             </div>
@@ -182,12 +232,12 @@ function HospitalInventory() {
               ></div>
             </div>
           </header>
-          <div className="flex-1 overflow-y-auto p-8 bg-slate-50">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-50">
             <div className="max-w-5xl mx-auto space-y-6">
               <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="px-6 py-5 border-b border-slate-200 flex items-center justify-between bg-white">
+                <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white">
                   <div>
-                    <h3 className="text-primary font-bold text-xl">
+                    <h3 className="text-primary font-bold text-lg sm:text-xl">
                       Blood Stock Control
                     </h3>
                     <p className="text-slate-500 text-xs mt-1">
@@ -197,45 +247,49 @@ function HospitalInventory() {
                   </div>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-sm">
+                  <table className="w-full text-left text-sm min-w-100">
                     <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
                       <tr>
-                        <th className="px-8 py-4 w-1/2">Blood Type</th>
-                        <th className="px-8 py-4">Quantity (Liters)</th>
+                        <th className="px-4 sm:px-8 py-3 sm:py-4 w-1/2">
+                          Blood Type
+                        </th>
+                        <th className="px-4 sm:px-8 py-3 sm:py-4">
+                          Quantity (Liters)
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {hospital.bloodInventory.bloodTypes.map(
                         (blood, index) => (
                           <tr key={index} className="hover:bg-slate-50">
-                            <td className="px-8 py-5 font-bold text-primary align-middle">
-                              <div className="flex items-center gap-4">
+                            <td className="px-4 sm:px-8 py-4 sm:py-5 font-bold text-primary align-middle">
+                              <div className="flex items-center gap-2 sm:gap-4">
                                 <span
-                                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+                                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm ${
                                     blood.type === "O-"
-                                      ? "bg-red-600 text-white ring-4 ring-red-100"
+                                      ? "bg-red-600 text-white ring-2 sm:ring-4 ring-red-100"
                                       : "bg-red-100 text-red-600"
                                   }`}
                                 >
                                   {blood.type}
                                 </span>
-                                <span className="text-base">
+                                <span className="text-sm sm:text-base">
                                   Blood {blood.type}
                                 </span>
                               </div>
                             </td>
-                            <td className="px-8 py-5">
-                              <div className="flex items-center max-w-55">
+                            <td className="px-4 sm:px-8 py-4 sm:py-5">
+                              <div className="flex items-center max-w-45 sm:max-w-55">
                                 <button
                                   onClick={() => handleDecrement(blood.type)}
-                                  className="w-10 h-10 flex items-center justify-center rounded-l-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 font-bold transition-colors"
+                                  className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-l-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 font-bold transition-colors"
                                 >
-                                  <span className="material-symbols-outlined">
+                                  <span className="material-symbols-outlined text-sm sm:text-base">
                                     remove
                                   </span>
                                 </button>
                                 <input
-                                  className="w-full h-10 text-center border-y border-slate-200 bg-white text-base font-medium focus:ring-0 focus:border-slate-200"
+                                  className="w-full h-8 sm:h-10 text-center border-y border-slate-200 bg-white text-sm sm:text-base font-medium focus:ring-0 focus:border-slate-200"
                                   type="number"
                                   value={inventoryData[blood.type] || 0}
                                   onChange={(e) =>
@@ -247,9 +301,9 @@ function HospitalInventory() {
                                 />
                                 <button
                                   onClick={() => handleIncrement(blood.type)}
-                                  className="w-10 h-10 flex items-center justify-center rounded-r-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 font-bold transition-colors"
+                                  className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-r-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-600 font-bold transition-colors"
                                 >
-                                  <span className="material-symbols-outlined">
+                                  <span className="material-symbols-outlined text-sm sm:text-base">
                                     add
                                   </span>
                                 </button>
@@ -261,15 +315,15 @@ function HospitalInventory() {
                     </tbody>
                   </table>
                 </div>
-                <div className="px-8 py-8 border-t border-slate-200 bg-slate-50 flex flex-col items-center">
+                <div className="px-4 sm:px-8 py-6 sm:py-8 border-t border-slate-200 bg-slate-50 flex flex-col items-center">
                   <button
                     onClick={handleUpdateInventory}
-                    className="w-full max-w-lg bg-primary hover:bg-primary/90 text-white font-bold py-4 px-8 rounded-lg transition-all flex items-center justify-center gap-3 shadow-xl shadow-primary/25 text-lg"
+                    className="w-full max-w-lg bg-primary hover:bg-primary/90 text-white font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-lg transition-all flex items-center justify-center gap-2 sm:gap-3 shadow-xl shadow-primary/25 text-base sm:text-lg"
                   >
                     <span className="material-symbols-outlined">save</span>
                     <span>Update Inventory Database</span>
                   </button>
-                  <p className="text-slate-400 text-[10px] mt-4 uppercase tracking-widest font-bold">
+                  <p className="text-slate-400 text-[10px] mt-3 sm:mt-4 uppercase tracking-widest font-bold text-center">
                     Last updated: 14:32:01 • By Admin
                   </p>
                 </div>

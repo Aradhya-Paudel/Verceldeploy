@@ -1,6 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Map from "../components/Map";
+import {
+  getPendingAccidents,
+  getAllHospitals,
+  updateAmbulanceLocation,
+  updateAmbulanceStatus,
+  addCasualty,
+  findBestHospital,
+} from "../services/api";
 
 function AmbulanceUser() {
   const navigate = useNavigate();
@@ -24,7 +32,6 @@ function AmbulanceUser() {
   const [isNavigatingToHospital, setIsNavigatingToHospital] = useState(false);
   const [distanceInMeters, setDistanceInMeters] = useState(null);
 
-  const API_ENDPOINT = ""; // Empty for now, will be configured later
   const PROXIMITY_THRESHOLD = 5; // 5 meters
 
   useEffect(() => {
@@ -38,17 +45,32 @@ function AmbulanceUser() {
 
     setUser(userName);
 
-    // Fetch submissions data
-    fetch("/submissions.json")
-      .then((res) => res.json())
-      .then((data) => setIncidents(data.submissions))
-      .catch((error) => console.error("Error loading incidents:", error));
+    // Fetch pending accidents from API
+    const fetchIncidents = async () => {
+      try {
+        const result = await getPendingAccidents();
+        if (result.success) {
+          setIncidents(result.data);
+        }
+      } catch (error) {
+        console.error("Error loading incidents:", error);
+      }
+    };
 
-    // Fetch hospitals data
-    fetch("/hospitals.json")
-      .then((res) => res.json())
-      .then((data) => setHospitals(data.hospitals))
-      .catch((error) => console.error("Error loading hospitals:", error));
+    // Fetch hospitals from API
+    const fetchHospitals = async () => {
+      try {
+        const result = await getAllHospitals();
+        if (result.success) {
+          setHospitals(result.data);
+        }
+      } catch (error) {
+        console.error("Error loading hospitals:", error);
+      }
+    };
+
+    fetchIncidents();
+    fetchHospitals();
 
     // Request location permission and start tracking
     requestLocationPermission();
@@ -216,39 +238,24 @@ function AmbulanceUser() {
   };
 
   const postLocationToBackend = async (coords) => {
-    if (API_ENDPOINT) {
-      try {
-        await fetch(`${API_ENDPOINT}/ambulance-location`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(coords),
-        });
-      } catch (error) {
-        console.error("Error posting location:", error);
-      }
-    } else {
-      // For now, just log to console (API not configured)
-      console.log("Ambulance location update:", coords);
+    try {
+      await updateAmbulanceLocation(user, coords.latitude, coords.longitude);
+    } catch (error) {
+      console.error("Error posting location:", error);
     }
   };
 
   // Accept incident and change status to busy
-  const handleAcceptIncident = () => {
+  const handleAcceptIncident = async () => {
     if (nearestIncident) {
       setAmbulanceStatus("busy");
       setCurrentIncident(nearestIncident);
 
       // Post status to backend
-      if (API_ENDPOINT) {
-        fetch(`${API_ENDPOINT}/ambulance-status`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ambulanceName: user,
-            status: "busy",
-            incidentId: nearestIncident.id,
-          }),
-        }).catch(console.error);
+      try {
+        await updateAmbulanceStatus(user, "busy", nearestIncident.id);
+      } catch (error) {
+        console.error("Error updating ambulance status:", error);
       }
     }
   };
@@ -287,37 +294,52 @@ function AmbulanceUser() {
   // Submit casualty data and navigate to hospital
   const handleSubmitCasualties = async () => {
     // Post casualty data to backend
-    if (API_ENDPOINT) {
-      try {
-        await fetch(`${API_ENDPOINT}/casualties`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            incidentId: currentIncident?.id,
-            ambulanceName: user,
-            casualties: casualties,
-            timestamp: new Date().toISOString(),
-          }),
+    try {
+      for (const casualty of casualties) {
+        await addCasualty({
+          accidentId: currentIncident?.id,
+          ambulanceName: user,
+          bloodType: casualty.bloodType,
+          requiredAmount: parseInt(casualty.requiredAmount) || 0,
+          severity: casualty.severity,
+          specialtyRequired: casualty.specialtyRequired,
         });
-      } catch (error) {
-        console.error("Error posting casualties:", error);
       }
-    } else {
-      console.log("Casualty data:", {
-        incidentId: currentIncident?.id,
-        casualties,
-      });
+
+      // Find best hospital based on casualties
+      if (casualties.length > 0 && location) {
+        const bestHospitalResult = await findBestHospital({
+          bloodType: casualties[0].bloodType,
+          specialtyRequired: casualties[0].specialtyRequired,
+          latitude: location.latitude,
+          longitude: location.longitude,
+        });
+
+        if (bestHospitalResult.success && bestHospitalResult.data) {
+          setNearestHospital(bestHospitalResult.data);
+        } else {
+          // Fallback to nearest hospital
+          const hospital = findNearestHospital();
+          setNearestHospital(hospital);
+        }
+      } else {
+        // Fallback to nearest hospital
+        const hospital = findNearestHospital();
+        setNearestHospital(hospital);
+      }
+    } catch (error) {
+      console.error("Error posting casualties:", error);
+      // Fallback to nearest hospital on error
+      const hospital = findNearestHospital();
+      setNearestHospital(hospital);
     }
 
-    // Find nearest hospital and start navigation
-    const hospital = findNearestHospital();
-    setNearestHospital(hospital);
     setIsNavigatingToHospital(true);
     setShowCasualtyPopup(false);
   };
 
   // Handle when ambulance reaches hospital
-  const handleReachedHospital = () => {
+  const handleReachedHospital = async () => {
     setAmbulanceStatus("active");
     setCurrentIncident(null);
     setIsNavigatingToHospital(false);
@@ -326,12 +348,10 @@ function AmbulanceUser() {
     setCasualtyCount(0);
 
     // Post status to backend
-    if (API_ENDPOINT) {
-      fetch(`${API_ENDPOINT}/ambulance-status`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ambulanceName: user, status: "active" }),
-      }).catch(console.error);
+    try {
+      await updateAmbulanceStatus(user, "active");
+    } catch (error) {
+      console.error("Error updating ambulance status:", error);
     }
   };
 
@@ -450,15 +470,15 @@ function AmbulanceUser() {
 
         {/* Casualty Data Entry Popup */}
         {showCasualtyPopup && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-slate-100">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+            <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+              <div className="p-4 sm:p-6 border-b border-slate-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-xl font-bold text-primary">
+                    <h2 className="text-lg sm:text-xl font-bold text-primary">
                       Casualty Data Entry
                     </h2>
-                    <p className="text-sm text-slate-500 mt-1">
+                    <p className="text-xs sm:text-sm text-slate-500 mt-1">
                       Enter details for each casualty
                     </p>
                   </div>
@@ -473,10 +493,10 @@ function AmbulanceUser() {
                   </button>
                 </div>
               </div>
-              <div className="p-6">
+              <div className="p-4 sm:p-6">
                 {/* Casualty Count Input */}
-                <div className="mb-6">
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">
+                <div className="mb-4 sm:mb-6">
+                  <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">
                     Number of Casualties
                   </label>
                   <input
@@ -485,26 +505,25 @@ function AmbulanceUser() {
                     max="20"
                     value={casualtyCount}
                     onChange={(e) => handleCasualtyCountChange(e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-sm sm:text-base"
                     placeholder="Enter number of casualties"
-                    
                   />
                 </div>
 
                 {/* Casualty Cards */}
                 {casualties.length > 0 && (
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     {casualties.map((casualty, index) => (
                       <div
                         key={casualty.id}
-                        className="bg-slate-50 rounded-xl p-4 border border-slate-200"
+                        className="bg-slate-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-slate-200"
                       >
-                        <h3 className="font-bold text-primary mb-3">
+                        <h3 className="font-bold text-primary mb-2 sm:mb-3 text-sm sm:text-base">
                           Casualty #{casualty.id}
                         </h3>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                           <div>
-                            <label className="block text-xs font-semibold text-slate-600 mb-1">
+                            <label className="block text-[10px] sm:text-xs font-semibold text-slate-600 mb-1">
                               Blood Type
                             </label>
                             <select
@@ -517,7 +536,7 @@ function AmbulanceUser() {
                                   e.target.value,
                                 )
                               }
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg text-xs sm:text-sm"
                             >
                               <option value="">Select</option>
                               <option value="A+">A+</option>
@@ -531,7 +550,7 @@ function AmbulanceUser() {
                             </select>
                           </div>
                           <div>
-                            <label className="block text-xs font-semibold text-slate-600 mb-1">
+                            <label className="block text-[10px] sm:text-xs font-semibold text-slate-600 mb-1">
                               Required Amount (L)
                             </label>
                             <input
@@ -547,12 +566,12 @@ function AmbulanceUser() {
                                   e.target.value,
                                 )
                               }
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg text-xs sm:text-sm"
                               placeholder="Liters"
                             />
                           </div>
                           <div>
-                            <label className="block text-xs font-semibold text-slate-600 mb-1">
+                            <label className="block text-[10px] sm:text-xs font-semibold text-slate-600 mb-1">
                               Severity
                             </label>
                             <select
@@ -565,7 +584,7 @@ function AmbulanceUser() {
                                   e.target.value,
                                 )
                               }
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg text-xs sm:text-sm"
                             >
                               <option value="">Select</option>
                               <option value="Critical">Critical</option>
@@ -575,7 +594,7 @@ function AmbulanceUser() {
                             </select>
                           </div>
                           <div>
-                            <label className="block text-xs font-semibold text-slate-600 mb-1">
+                            <label className="block text-[10px] sm:text-xs font-semibold text-slate-600 mb-1">
                               Specialty Required
                             </label>
                             <select
@@ -588,7 +607,7 @@ function AmbulanceUser() {
                                   e.target.value,
                                 )
                               }
-                              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm"
+                              className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg text-xs sm:text-sm"
                             >
                               <option value="">Select</option>
                               <option value="Cardiologist">Cardiologist</option>
@@ -623,9 +642,9 @@ function AmbulanceUser() {
                 {casualties.length > 0 && (
                   <button
                     onClick={handleSubmitCasualties}
-                    className="w-full mt-6 bg-primary text-white py-3 rounded-lg font-bold hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+                    className="w-full mt-4 sm:mt-6 bg-primary text-white py-2.5 sm:py-3 rounded-lg font-bold hover:bg-slate-800 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
                   >
-                    <span className="material-symbols-outlined">
+                    <span className="material-symbols-outlined text-lg sm:text-xl">
                       local_hospital
                     </span>
                     Submit & Navigate to Hospital
@@ -638,25 +657,27 @@ function AmbulanceUser() {
 
         {/* Hospital Navigation Banner */}
         {isNavigatingToHospital && nearestHospital && (
-          <div className="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined animate-pulse">
+          <div className="bg-blue-600 text-white px-3 sm:px-4 py-2 sm:py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="material-symbols-outlined animate-pulse text-lg sm:text-xl">
                 local_hospital
               </span>
               <div>
-                <p className="font-bold">
+                <p className="font-bold text-sm sm:text-base">
                   Navigating to {nearestHospital.name}
                 </p>
-                <p className="text-xs text-blue-200">
+                <p className="text-[10px] sm:text-xs text-blue-200">
                   {nearestHospital.address}
                 </p>
               </div>
             </div>
             <button
               onClick={handleReachedHospital}
-              className="bg-white text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-blue-50 transition-colors flex items-center gap-2"
+              className="w-full sm:w-auto bg-white text-blue-600 px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-bold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm"
             >
-              <span className="material-symbols-outlined">check_circle</span>
+              <span className="material-symbols-outlined text-base sm:text-lg">
+                check_circle
+              </span>
               Reached Hospital
             </button>
           </div>
@@ -665,13 +686,13 @@ function AmbulanceUser() {
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
           {/* Show sidebar based on ambulance status */}
           {ambulanceStatus === "active" && nearestIncident ? (
-            <aside className="w-80 bg-white border-r border-slate-200 flex flex-col h-full shadow-lg z-10">
-              <div className="p-6 border-b border-slate-100">
+            <aside className="w-full md:w-80 bg-white border-b md:border-b-0 md:border-r border-slate-200 flex flex-col md:h-full shadow-lg z-10 max-h-[40vh] md:max-h-none overflow-y-auto">
+              <div className="p-4 sm:p-6 border-b border-slate-100">
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-red-600 animate-pulse">
                     emergency_home
                   </span>
-                  <h2 className="text-primary font-bold text-lg">
+                  <h2 className="text-primary font-bold text-base sm:text-lg">
                     Nearest Incident
                   </h2>
                 </div>
@@ -679,9 +700,9 @@ function AmbulanceUser() {
                   Priority Response
                 </p>
               </div>
-              <div className="p-4 flex-1 overflow-y-auto">
-                <div className="w-full mb-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-4">
-                  <div className="relative h-32 w-full rounded-lg overflow-hidden mb-3">
+              <div className="p-3 sm:p-4 flex-1 overflow-y-auto">
+                <div className="w-full mb-4 bg-white/95 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-xl border border-white/50 p-3 sm:p-4">
+                  <div className="relative h-24 sm:h-32 w-full rounded-lg overflow-hidden mb-2 sm:mb-3">
                     <img
                       alt={nearestIncident.title}
                       className="w-full h-full object-cover grayscale-[0.3]"
@@ -689,19 +710,19 @@ function AmbulanceUser() {
                     />
                   </div>
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-sm font-bold text-primary">
+                    <h3 className="text-xs sm:text-sm font-bold text-primary">
                       {nearestIncident.title}
                     </h3>
                   </div>
                   <div className="flex items-center gap-2 text-slate-600 mb-2">
-                    <span className="material-symbols-outlined text-lg text-primary">
+                    <span className="material-symbols-outlined text-base sm:text-lg text-primary">
                       location_on
                     </span>
-                    <span className="text-xs font-semibold">
+                    <span className="text-[10px] sm:text-xs font-semibold">
                       {nearestIncident.location}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-[10px] mb-3">
+                  <div className="flex items-center justify-between text-[10px] mb-2 sm:mb-3">
                     <span className="text-slate-500">
                       {nearestIncident.time}
                     </span>
@@ -709,11 +730,11 @@ function AmbulanceUser() {
                       {nearestIncident.status}
                     </span>
                   </div>
-                  <div className="bg-linear-to-r from-blue-50 to-blue-100 rounded-lg p-2 flex items-center justify-between mb-4">
-                    <span className="text-xs font-semibold text-blue-900">
+                  <div className="bg-linear-to-r from-blue-50 to-blue-100 rounded-lg p-2 flex items-center justify-between mb-3 sm:mb-4">
+                    <span className="text-[10px] sm:text-xs font-semibold text-blue-900">
                       Distance:
                     </span>
-                    <span className="text-sm font-bold text-blue-600">
+                    <span className="text-xs sm:text-sm font-bold text-blue-600">
                       {distanceInMeters
                         ? `${distanceInMeters.toFixed(0)}m`
                         : "Calculating..."}
@@ -721,9 +742,9 @@ function AmbulanceUser() {
                   </div>
                   <button
                     onClick={handleAcceptIncident}
-                    className="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-red-600 text-white py-2 sm:py-3 rounded-lg font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm"
                   >
-                    <span className="material-symbols-outlined">
+                    <span className="material-symbols-outlined text-base sm:text-lg">
                       directions
                     </span>
                     Accept & Navigate
@@ -734,43 +755,45 @@ function AmbulanceUser() {
           ) : ambulanceStatus === "busy" &&
             currentIncident &&
             !isNavigatingToHospital ? (
-            <aside className="w-80 bg-white border-r border-slate-200 flex flex-col h-full shadow-lg z-10">
-              <div className="p-6 border-b border-slate-100">
+            <aside className="w-full md:w-80 bg-white border-b md:border-b-0 md:border-r border-slate-200 flex flex-col md:h-full shadow-lg z-10 max-h-[40vh] md:max-h-none overflow-y-auto">
+              <div className="p-4 sm:p-6 border-b border-slate-100">
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-orange-600 animate-pulse">
                     directions_car
                   </span>
-                  <h2 className="text-primary font-bold text-lg">En Route</h2>
+                  <h2 className="text-primary font-bold text-base sm:text-lg">
+                    En Route
+                  </h2>
                 </div>
                 <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-widest font-semibold">
                   Responding to Incident
                 </p>
               </div>
-              <div className="p-4 flex-1 overflow-y-auto">
-                <div className="w-full mb-4 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-orange-200 p-4">
-                  <div className="relative h-32 w-full rounded-lg overflow-hidden mb-3">
+              <div className="p-3 sm:p-4 flex-1 overflow-y-auto">
+                <div className="w-full mb-4 bg-white/95 backdrop-blur-md rounded-xl sm:rounded-2xl shadow-xl border border-orange-200 p-3 sm:p-4">
+                  <div className="relative h-24 sm:h-32 w-full rounded-lg overflow-hidden mb-2 sm:mb-3">
                     <img
                       alt={currentIncident.title}
                       className="w-full h-full object-cover"
                       src={currentIncident.image}
                     />
                   </div>
-                  <h3 className="text-sm font-bold text-primary mb-2">
+                  <h3 className="text-xs sm:text-sm font-bold text-primary mb-2">
                     {currentIncident.title}
                   </h3>
                   <div className="flex items-center gap-2 text-slate-600 mb-2">
-                    <span className="material-symbols-outlined text-lg text-primary">
+                    <span className="material-symbols-outlined text-base sm:text-lg text-primary">
                       location_on
                     </span>
-                    <span className="text-xs font-semibold">
+                    <span className="text-[10px] sm:text-xs font-semibold">
                       {currentIncident.location}
                     </span>
                   </div>
-                  <div className="bg-linear-to-r from-orange-50 to-orange-100 rounded-lg p-3 flex items-center justify-between mb-4">
-                    <span className="text-xs font-semibold text-orange-900">
+                  <div className="bg-linear-to-r from-orange-50 to-orange-100 rounded-lg p-2 sm:p-3 flex items-center justify-between mb-3 sm:mb-4">
+                    <span className="text-[10px] sm:text-xs font-semibold text-orange-900">
                       Distance:
                     </span>
-                    <span className="text-lg font-bold text-orange-600">
+                    <span className="text-sm sm:text-lg font-bold text-orange-600">
                       {distanceInMeters
                         ? `${distanceInMeters.toFixed(0)}m`
                         : "Calculating..."}
@@ -781,15 +804,15 @@ function AmbulanceUser() {
                   {isWithinProximity ? (
                     <button
                       onClick={handleReachedIncident}
-                      className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 animate-pulse"
+                      className="w-full bg-green-600 text-white py-2 sm:py-3 rounded-lg font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 animate-pulse text-xs sm:text-sm"
                     >
-                      <span className="material-symbols-outlined">
+                      <span className="material-symbols-outlined text-base sm:text-lg">
                         check_circle
                       </span>
                       Reached?
                     </button>
                   ) : (
-                    <div className="w-full bg-slate-100 text-slate-500 py-3 rounded-lg font-semibold text-center text-sm">
+                    <div className="w-full bg-slate-100 text-slate-500 py-2 sm:py-3 rounded-lg font-semibold text-center text-[10px] sm:text-sm">
                       Get within 5m to confirm arrival
                     </div>
                   )}
@@ -797,25 +820,25 @@ function AmbulanceUser() {
               </div>
             </aside>
           ) : (
-            // Default sidebar - System Status
-            <div className="hidden md:block absolute top-6 left-6 z-10 w-80">
+            // Default sidebar - System Status (hidden on mobile when no incident)
+            <div className="hidden md:block absolute top-6 left-6 z-10 w-72 lg:w-80">
               <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-2 w-auto h-auto m-4">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                  <h2 className="text-primary font-bold text-lg">
+                  <h2 className="text-primary font-bold text-base lg:text-lg">
                     System Status
                   </h2>
                 </div>
-                <div className="py-12 flex flex-col items-center justify-center border-t border-slate-100">
-                  <span className="material-symbols-outlined text-primary/20 text-5xl mb-4">
+                <div className="py-8 lg:py-12 flex flex-col items-center justify-center border-t border-slate-100">
+                  <span className="material-symbols-outlined text-primary/20 text-4xl lg:text-5xl mb-4">
                     check_circle
                   </span>
-                  <p className="text-primary font-semibold text-center text-base">
+                  <p className="text-primary font-semibold text-center text-sm lg:text-base">
                     {isNavigatingToHospital
                       ? "Navigating to Hospital"
                       : "No accidents nearby"}
                   </p>
-                  <p className="text-slate-400 text-[11px] text-center mt-2 uppercase tracking-widest font-medium">
+                  <p className="text-slate-400 text-[10px] lg:text-[11px] text-center mt-2 uppercase tracking-widest font-medium">
                     {ambulanceStatus === "active"
                       ? "Scanning Area"
                       : "In Transit"}
@@ -824,7 +847,7 @@ function AmbulanceUser() {
               </div>
             </div>
           )}
-          <main className="flex-1 relative overflow-hidden m-2 md:m-6 rounded-2xl border border-slate-300/30 shadow-inner">
+          <main className="flex-1 relative overflow-hidden m-1 sm:m-2 md:m-6 rounded-xl sm:rounded-2xl border border-slate-300/30 shadow-inner min-h-75 md:min-h-0">
             <Map
               ambulanceLocation={location}
               ambulanceName={user}

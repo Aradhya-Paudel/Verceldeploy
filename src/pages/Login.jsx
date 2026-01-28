@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { ambulanceLogin, hospitalLogin } from "../services/api";
 
 const currentDate = new Date().getFullYear();
 
@@ -52,36 +53,30 @@ function Login() {
     setLoading(true);
 
     try {
-      // Fetch hospitals data
-      const hospitalsData = await fetch("/hospitals.json").then((r) =>
-        r.json(),
-      );
-
-      // Fetch ambulances data
-      const ambulancesData = await fetch("/ambulances.json").then((r) =>
-        r.json(),
-      );
-
-      // Check hospitals
-      const hospital = hospitalsData.hospitals.find(
-        (h) => h.name === user.trim() && h.password === password,
-      );
-      if (hospital) {
+      // Try hospital login first
+      const hospitalResult = await hospitalLogin(user.trim(), password);
+      if (hospitalResult.success) {
         localStorage.setItem("adminAuth", "true");
         localStorage.setItem("userType", "hospital");
-        localStorage.setItem("userName", hospital.name);
+        localStorage.setItem("userName", hospitalResult.data.name);
+        localStorage.setItem(
+          "hospitalData",
+          JSON.stringify(hospitalResult.data),
+        );
         navigate("/hospital", { replace: true });
         return;
       }
 
-      // Check ambulances
-      const ambulance = ambulancesData.ambulances.find(
-        (a) => a.name === user.trim() && a.password === password,
-      );
-      if (ambulance) {
+      // Try ambulance login
+      const ambulanceResult = await ambulanceLogin(user.trim(), password);
+      if (ambulanceResult.success) {
         localStorage.setItem("adminAuth", "true");
         localStorage.setItem("userType", "ambulance");
-        localStorage.setItem("userName", ambulance.name);
+        localStorage.setItem("userName", ambulanceResult.data.name);
+        localStorage.setItem(
+          "ambulanceData",
+          JSON.stringify(ambulanceResult.data),
+        );
         navigate("/ambulance", { replace: true });
         return;
       }
