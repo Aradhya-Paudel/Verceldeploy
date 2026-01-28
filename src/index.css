@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #2d336b;
+  --color-accent: #a9b5df;
+  --color-soft-bg: #fff2f2;
+  --color-background-light: #f6f6f7;
+  --color-background-dark: #15161d;
+
+  --font-family-display: "Lexend", sans-serif;
+
+  --radius-default: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+}
+
+@layer base {
+  .Main {
+    font-family: "Lexend", sans-serif;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings:
+      "FILL" 0,
+      "wght" 400,
+      "GRAD" 0,
+      "opsz" 24;
+  }
+}
