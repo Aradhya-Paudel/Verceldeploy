@@ -22,11 +22,23 @@ const apiRequest = async (endpoint, options = {}) => {
       },
       ...options,
     });
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (jsonErr) {
+      // If not JSON, return status and text
+      const text = await response.text();
+      return {
+        success: false,
+        error: `Non-JSON response: ${text}`,
+        status: response.status,
+      };
+    }
     return data; // Return the full response as-is from backend
   } catch (error) {
-    console.error(`API Error [${endpoint}]:`, error);
-    return { success: false, error: error.message };
+    // Log more details for production debugging
+    console.error(`API Error [${endpoint}]:`, error, options);
+    return { success: false, error: error.message, endpoint, options };
   }
 };
 
@@ -139,6 +151,13 @@ export const findNearestAmbulance = async (latitude, longitude) => {
  * @returns {Promise<object>} - { success, data, error }
  */
 export const updateAmbulanceLocation = async (id, latitude, longitude) => {
+  if (!id || typeof id !== "string" || id.trim() === "") {
+    console.error(
+      "updateAmbulanceLocation: Invalid or missing ambulance id",
+      id,
+    );
+    return { success: false, error: "Invalid or missing ambulance id" };
+  }
   const response = await apiRequest(
     `/ambulances/${encodeURIComponent(id)}/location`,
     {

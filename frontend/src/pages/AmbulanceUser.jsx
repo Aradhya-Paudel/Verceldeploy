@@ -32,7 +32,7 @@ function AmbulanceUser() {
   const [isNavigatingToHospital, setIsNavigatingToHospital] = useState(false);
   const [distanceInMeters, setDistanceInMeters] = useState(null);
 
-  const PROXIMITY_THRESHOLD = 20; // 5 meters
+  const PROXIMITY_THRESHOLD = 20;
 
   useEffect(() => {
     const userName = localStorage.getItem("userName");
@@ -44,6 +44,11 @@ function AmbulanceUser() {
     }
 
     setUser(userName);
+
+    // Only start location tracking after user is set
+    if (userName) {
+      requestLocationPermission(userName);
+    }
 
     // Fetch pending accidents from API
     const fetchIncidents = async () => {
@@ -72,8 +77,7 @@ function AmbulanceUser() {
     fetchIncidents();
     fetchHospitals();
 
-    // Request location permission and start tracking
-    requestLocationPermission();
+    // (moved above)
   }, [navigate]);
 
   // Calculate distance in meters using Haversine formula
@@ -173,7 +177,7 @@ function AmbulanceUser() {
     return nearest;
   }, [location, hospitals, calculateDistanceMeters]);
 
-  const requestLocationPermission = async () => {
+  const requestLocationPermission = async (userNameParam) => {
     setLocationStatus("requesting");
     setLocationError(null);
 
@@ -190,12 +194,12 @@ function AmbulanceUser() {
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
           timestamp: new Date().toISOString(),
-          ambulanceName: user,
+          ambulanceName: userNameParam,
         };
 
         setLocation(coords);
         setLocationStatus("active");
-        postLocationToBackend(coords);
+        postLocationToBackend(coords, userNameParam);
 
         // Watch position for continuous updates
         const watchId = navigator.geolocation.watchPosition(
@@ -205,10 +209,10 @@ function AmbulanceUser() {
               longitude: newPosition.coords.longitude,
               accuracy: newPosition.coords.accuracy,
               timestamp: new Date().toISOString(),
-              ambulanceName: user,
+              ambulanceName: userNameParam,
             };
             setLocation(updatedCoords);
-            postLocationToBackend(updatedCoords);
+            postLocationToBackend(updatedCoords, userNameParam);
           },
           (error) => {
             console.error("Error watching position:", error);
@@ -237,9 +241,15 @@ function AmbulanceUser() {
     );
   };
 
-  const postLocationToBackend = async (coords) => {
+  const postLocationToBackend = async (coords, userNameParam) => {
     try {
-      await updateAmbulanceLocation(user, coords.latitude, coords.longitude);
+      // Use userNameParam if provided, else fallback to user state
+      const ambulanceId = userNameParam || user;
+      await updateAmbulanceLocation(
+        ambulanceId,
+        coords.latitude,
+        coords.longitude,
+      );
     } catch (error) {
       console.error("Error posting location:", error);
     }
