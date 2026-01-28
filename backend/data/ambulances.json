@@ -75,10 +75,11 @@
       "password": "help911pass",
       "latitude": 28.215,
       "longitude": 83.9755,
-      "status": "available",
+      "status": "dispatched",
       "hospitalId": 4,
       "driverName": "Nabin Shrestha",
-      "phone": "+977-98-56078901"
+      "phone": "+977-98-56078901",
+      "currentAccidentId": "ACC-1769606609452"
     },
     {
       "id": "AMB-008",
@@ -86,10 +87,11 @@
       "password": "quickhelp88",
       "latitude": 28.2072,
       "longitude": 83.9798,
-      "status": "available",
+      "status": "dispatched",
       "hospitalId": 5,
       "driverName": "Sunil Tamang",
-      "phone": "+977-98-56089012"
+      "phone": "+977-98-56089012",
+      "currentAccidentId": "ACC-1769607400054"
     }
   ]
 }

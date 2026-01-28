@@ -32,7 +32,7 @@ function AmbulanceUser() {
   const [isNavigatingToHospital, setIsNavigatingToHospital] = useState(false);
   const [distanceInMeters, setDistanceInMeters] = useState(null);
 
-  const PROXIMITY_THRESHOLD = 5; // 5 meters
+  const PROXIMITY_THRESHOLD = 20; // 5 meters
 
   useEffect(() => {
     const userName = localStorage.getItem("userName");

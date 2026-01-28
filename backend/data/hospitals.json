@@ -93,39 +93,39 @@
       "ambulanceCount": 8,
       "bedsAvailable": 35,
       "bloodInventory": {
-        "total": 1250,
+        "total": 2,
         "bloodTypes": [
           {
             "type": "A+",
-            "units": 320
+            "liters": 0
           },
           {
             "type": "A-",
-            "units": 35
+            "liters": 0
           },
           {
             "type": "B+",
-            "units": 280
+            "liters": 0
           },
           {
             "type": "B-",
-            "units": 60
+            "liters": 0
           },
           {
             "type": "O+",
-            "units": 380
+            "liters": 2
           },
           {
             "type": "O-",
-            "units": 25
+            "liters": 0
           },
           {
             "type": "AB+",
-            "units": 110
+            "liters": 0
           },
           {
             "type": "AB-",
-            "units": 40
+            "liters": 0
           }
         ]
       },
