@@ -1,0 +1,95 @@
+{
+  "ambulances": [
+    {
+      "id": "AMB-001",
+      "name": "MH-02-AB-0001",
+      "password": "ambulance@123",
+      "latitude": 28.2109,
+      "longitude": 83.9774,
+      "status": "dispatched",
+      "hospitalId": 1,
+      "driverName": "Ram Bahadur Thapa",
+      "phone": "+977-98-56012345",
+      "currentAccidentId": "ACC-1769574428461"
+    },
+    {
+      "id": "AMB-002",
+      "name": "MH-02-AB-0002",
+      "password": "ambu2024pass",
+      "latitude": 28.2094,
+      "longitude": 83.9815,
+      "status": "dispatched",
+      "hospitalId": 1,
+      "driverName": "Hari Prasad Sharma",
+      "phone": "+977-98-56023456",
+      "currentAccidentId": "ACC-1769578941517"
+    },
+    {
+      "id": "AMB-003",
+      "name": "MH-02-AB-0003",
+      "password": "emerg@ncy99",
+      "latitude": 28.2138,
+      "longitude": 83.9879,
+      "status": "available",
+      "hospitalId": 2,
+      "driverName": "Bikram Gurung",
+      "phone": "+977-98-56034567"
+    },
+    {
+      "id": "AMB-004",
+      "name": "MH-02-AB-0004",
+      "password": "rescue2024",
+      "latitude": 28.2057,
+      "longitude": 83.9732,
+      "status": "available",
+      "hospitalId": 2,
+      "driverName": "Sanjay Rai",
+      "phone": "+977-98-56045678"
+    },
+    {
+      "id": "AMB-005",
+      "name": "MH-02-AB-0005",
+      "password": "response123",
+      "latitude": 28.2125,
+      "longitude": 83.98,
+      "status": "dispatched",
+      "hospitalId": 3,
+      "driverName": "Deepak Magar",
+      "phone": "+977-98-56056789",
+      "currentAccidentId": "ACC-1769578741971"
+    },
+    {
+      "id": "AMB-006",
+      "name": "MH-02-AB-0006",
+      "password": "medic@rescue",
+      "latitude": 28.2089,
+      "longitude": 83.9856,
+      "status": "available",
+      "hospitalId": 3,
+      "driverName": "Prakash Karki",
+      "phone": "+977-98-56067890"
+    },
+    {
+      "id": "AMB-007",
+      "name": "MH-02-AB-0007",
+      "password": "help911pass",
+      "latitude": 28.215,
+      "longitude": 83.9755,
+      "status": "available",
+      "hospitalId": 4,
+      "driverName": "Nabin Shrestha",
+      "phone": "+977-98-56078901"
+    },
+    {
+      "id": "AMB-008",
+      "name": "MH-02-AB-0008",
+      "password": "quickhelp88",
+      "latitude": 28.2072,
+      "longitude": 83.9798,
+      "status": "available",
+      "hospitalId": 5,
+      "driverName": "Sunil Tamang",
+      "phone": "+977-98-56089012"
+    }
+  ]
+}

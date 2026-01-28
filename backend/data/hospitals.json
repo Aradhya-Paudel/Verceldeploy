@@ -1,0 +1,400 @@
+{
+  "hospitals": [
+    {
+      "id": 1,
+      "name": "Western Regional Hospital",
+      "password": "hospital123",
+      "email": "admin@westernregional.gov.np",
+      "phone": "+977-61-520066",
+      "address": "Ramghat, Pokhara-8, Kaski, Nepal",
+      "location": "Ramghat, Pokhara",
+      "latitude": 28.2096,
+      "longitude": 83.9856,
+      "ambulanceCount": 9,
+      "bedsAvailable": 50,
+      "bloodInventory": {
+        "total": 6,
+        "bloodTypes": [
+          {
+            "type": "A+",
+            "liters": 3
+          },
+          {
+            "type": "A-",
+            "liters": 2
+          },
+          {
+            "type": "B+",
+            "liters": 1
+          },
+          {
+            "type": "B-",
+            "liters": 0
+          },
+          {
+            "type": "O+",
+            "liters": 0
+          },
+          {
+            "type": "O-",
+            "liters": 0
+          },
+          {
+            "type": "AB+",
+            "liters": 0
+          },
+          {
+            "type": "AB-",
+            "liters": 0
+          }
+        ]
+      },
+      "staffCount": {
+        "Cardiologist": 0,
+        "Neurologist": 2,
+        "Orthopedic Surgeon": 2,
+        "General Surgeon": 3,
+        "Anesthesiologist": 2,
+        "Radiologist": 1,
+        "Oncologist": 7,
+        "Pediatrician": 3,
+        "Psychiatrist": 1,
+        "Dermatologist": 2,
+        "Gastroenterologist": 5,
+        "Nephrologist": 1,
+        "Pulmonologist": 2,
+        "Endocrinologist": 1,
+        "Rheumatologist": 0,
+        "Urologist": 1,
+        "Ophthalmologist": 2,
+        "ENT Specialist": 1,
+        "Gynecologist": 2,
+        "Emergency Medicine Specialist": 3
+      },
+      "specialties": [
+        "Trauma",
+        "Cardiac",
+        "Neurology",
+        "Orthopedics",
+        "Emergency"
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": 2,
+      "name": "Manipal Teaching Hospital",
+      "password": "manipal456",
+      "email": "info@manipal.edu.np",
+      "phone": "+977-61-526416",
+      "address": "Phulbari, Pokhara-11, Kaski, Nepal",
+      "location": "Phulbari, Pokhara",
+      "latitude": 28.218,
+      "longitude": 83.995,
+      "ambulanceCount": 8,
+      "bedsAvailable": 35,
+      "bloodInventory": {
+        "total": 1250,
+        "bloodTypes": [
+          {
+            "type": "A+",
+            "units": 320
+          },
+          {
+            "type": "A-",
+            "units": 35
+          },
+          {
+            "type": "B+",
+            "units": 280
+          },
+          {
+            "type": "B-",
+            "units": 60
+          },
+          {
+            "type": "O+",
+            "units": 380
+          },
+          {
+            "type": "O-",
+            "units": 25
+          },
+          {
+            "type": "AB+",
+            "units": 110
+          },
+          {
+            "type": "AB-",
+            "units": 40
+          }
+        ]
+      },
+      "staffCount": {
+        "Cardiologist": 2,
+        "Neurologist": 3,
+        "Orthopedic Surgeon": 2,
+        "General Surgeon": 4,
+        "Anesthesiologist": 3,
+        "Radiologist": 2,
+        "Oncologist": 1,
+        "Pediatrician": 4,
+        "Psychiatrist": 2,
+        "Dermatologist": 1,
+        "Gastroenterologist": 2,
+        "Nephrologist": 1,
+        "Pulmonologist": 1,
+        "Endocrinologist": 2,
+        "Rheumatologist": 1,
+        "Urologist": 2,
+        "Ophthalmologist": 1,
+        "ENT Specialist": 2,
+        "Gynecologist": 3,
+        "Emergency Medicine Specialist": 2
+      },
+      "specialties": [
+        "Neurology",
+        "Pediatrics",
+        "General Surgery",
+        "Gynecology"
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": 3,
+      "name": "Gandaki Medical College",
+      "password": "gandaki789",
+      "email": "admin@gandakimc.edu.np",
+      "phone": "+977-61-538595",
+      "address": "Lekhnath Road, Pokhara-15, Kaski, Nepal",
+      "location": "Lekhnath, Pokhara",
+      "latitude": 28.235,
+      "longitude": 84.012,
+      "ambulanceCount": 6,
+      "bedsAvailable": 28,
+      "bloodInventory": {
+        "total": 980,
+        "bloodTypes": [
+          {
+            "type": "A+",
+            "units": 250
+          },
+          {
+            "type": "A-",
+            "units": 28
+          },
+          {
+            "type": "B+",
+            "units": 200
+          },
+          {
+            "type": "B-",
+            "units": 45
+          },
+          {
+            "type": "O+",
+            "units": 320
+          },
+          {
+            "type": "O-",
+            "units": 18
+          },
+          {
+            "type": "AB+",
+            "units": 85
+          },
+          {
+            "type": "AB-",
+            "units": 34
+          }
+        ]
+      },
+      "staffCount": {
+        "Cardiologist": 1,
+        "Neurologist": 1,
+        "Orthopedic Surgeon": 3,
+        "General Surgeon": 2,
+        "Anesthesiologist": 2,
+        "Radiologist": 1,
+        "Oncologist": 1,
+        "Pediatrician": 2,
+        "Psychiatrist": 1,
+        "Dermatologist": 2,
+        "Gastroenterologist": 1,
+        "Nephrologist": 2,
+        "Pulmonologist": 1,
+        "Endocrinologist": 1,
+        "Rheumatologist": 1,
+        "Urologist": 1,
+        "Ophthalmologist": 2,
+        "ENT Specialist": 1,
+        "Gynecologist": 2,
+        "Emergency Medicine Specialist": 2
+      },
+      "specialties": [
+        "Orthopedics",
+        "Nephrology",
+        "Ophthalmology",
+        "Emergency"
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": 4,
+      "name": "Fishtail Hospital",
+      "password": "fishtail321",
+      "email": "contact@fishtailhospital.com.np",
+      "phone": "+977-61-465068",
+      "address": "Gairapatan, Pokhara-4, Kaski, Nepal",
+      "location": "Gairapatan, Pokhara",
+      "latitude": 28.1985,
+      "longitude": 83.972,
+      "ambulanceCount": 4,
+      "bedsAvailable": 18,
+      "bloodInventory": {
+        "total": 650,
+        "bloodTypes": [
+          {
+            "type": "A+",
+            "units": 180
+          },
+          {
+            "type": "A-",
+            "units": 20
+          },
+          {
+            "type": "B+",
+            "units": 140
+          },
+          {
+            "type": "B-",
+            "units": 30
+          },
+          {
+            "type": "O+",
+            "units": 200
+          },
+          {
+            "type": "O-",
+            "units": 10
+          },
+          {
+            "type": "AB+",
+            "units": 50
+          },
+          {
+            "type": "AB-",
+            "units": 20
+          }
+        ]
+      },
+      "staffCount": {
+        "Cardiologist": 1,
+        "Neurologist": 1,
+        "Orthopedic Surgeon": 1,
+        "General Surgeon": 2,
+        "Anesthesiologist": 1,
+        "Radiologist": 1,
+        "Oncologist": 0,
+        "Pediatrician": 2,
+        "Psychiatrist": 1,
+        "Dermatologist": 1,
+        "Gastroenterologist": 1,
+        "Nephrologist": 0,
+        "Pulmonologist": 1,
+        "Endocrinologist": 1,
+        "Rheumatologist": 0,
+        "Urologist": 1,
+        "Ophthalmologist": 1,
+        "ENT Specialist": 1,
+        "Gynecologist": 1,
+        "Emergency Medicine Specialist": 1
+      },
+      "specialties": [
+        "General Surgery",
+        "Pediatrics",
+        "ENT",
+        "Emergency"
+      ],
+      "isAvailable": true
+    },
+    {
+      "id": 5,
+      "name": "Metro City Hospital",
+      "password": "metro555",
+      "email": "info@metrohospital.com.np",
+      "phone": "+977-61-590123",
+      "address": "Chipledhunga, Pokhara-9, Kaski, Nepal",
+      "location": "Chipledhunga, Pokhara",
+      "latitude": 28.2045,
+      "longitude": 83.991,
+      "ambulanceCount": 5,
+      "bedsAvailable": 22,
+      "bloodInventory": {
+        "total": 820,
+        "bloodTypes": [
+          {
+            "type": "A+",
+            "units": 210
+          },
+          {
+            "type": "A-",
+            "units": 25
+          },
+          {
+            "type": "B+",
+            "units": 175
+          },
+          {
+            "type": "B-",
+            "units": 40
+          },
+          {
+            "type": "O+",
+            "units": 260
+          },
+          {
+            "type": "O-",
+            "units": 15
+          },
+          {
+            "type": "AB+",
+            "units": 70
+          },
+          {
+            "type": "AB-",
+            "units": 25
+          }
+        ]
+      },
+      "staffCount": {
+        "Cardiologist": 2,
+        "Neurologist": 1,
+        "Orthopedic Surgeon": 2,
+        "General Surgeon": 2,
+        "Anesthesiologist": 2,
+        "Radiologist": 1,
+        "Oncologist": 1,
+        "Pediatrician": 2,
+        "Psychiatrist": 1,
+        "Dermatologist": 1,
+        "Gastroenterologist": 1,
+        "Nephrologist": 1,
+        "Pulmonologist": 2,
+        "Endocrinologist": 1,
+        "Rheumatologist": 0,
+        "Urologist": 1,
+        "Ophthalmologist": 1,
+        "ENT Specialist": 1,
+        "Gynecologist": 2,
+        "Emergency Medicine Specialist": 2
+      },
+      "specialties": [
+        "Cardiac",
+        "Pulmonology",
+        "Gynecology",
+        "Emergency"
+      ],
+      "isAvailable": true
+    }
+  ]
+}
