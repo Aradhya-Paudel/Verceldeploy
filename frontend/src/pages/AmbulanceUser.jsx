@@ -18,12 +18,12 @@ function AmbulanceUser() {
   const [incidents, setIncidents] = useState([]);
   const [location, setLocation] = useState(null);
   const [locationError, setLocationError] = useState(null);
-  const [locationStatus, setLocationStatus] = useState("idle"); // idle, requesting, active
+  const [locationStatus, setLocationStatus] = useState("idle"); // idle, requesting, active (status haru)
   const [nearestIncident, setNearestIncident] = useState(null);
   const [nearestDistance, setNearestDistance] = useState(null);
 
-  // New states for ambulance workflow
-  const [ambulanceStatus, setAmbulanceStatus] = useState("active"); // active, busy
+  // Ambulance workflow ko lagi naya states (New states for ambulance workflow)
+  const [ambulanceStatus, setAmbulanceStatus] = useState("active"); // active, busy (status)
   const [currentIncident, setCurrentIncident] = useState(null);
   const [showCasualtyPopup, setShowCasualtyPopup] = useState(false);
   const [casualtyCount, setCasualtyCount] = useState(0);
@@ -46,7 +46,7 @@ function AmbulanceUser() {
 
     setUser(userName);
 
-    // Fetch ambulance data by name and store id
+    // Ambulance data name le fetch garne ra id store garne (Fetch ambulance data by name and store id)
     const fetchAmbulanceData = async () => {
       try {
         const res = await getAllAmbulances();
@@ -55,17 +55,17 @@ function AmbulanceUser() {
           if (found) setAmbulanceData(found);
         }
       } catch (e) {
-        // ignore
+        // ignore (error ignore garne)
       }
     };
     fetchAmbulanceData();
 
-    // Only start location tracking after user is set
+    // User set bhaye matra location tracking start garne (Only start location tracking after user is set)
     if (userName) {
       requestLocationPermission(userName);
     }
 
-    // Fetch pending accidents from API
+    // API bata pending accidents fetch garne (Fetch pending accidents from API)
     const fetchIncidents = async () => {
       try {
         const result = await getPendingAccidents();
@@ -77,7 +77,7 @@ function AmbulanceUser() {
       }
     };
 
-    // Fetch hospitals from API
+    // API bata hospitals fetch garne (Fetch hospitals from API)
     const fetchHospitals = async () => {
       try {
         const result = await getAllHospitals();
@@ -92,15 +92,15 @@ function AmbulanceUser() {
     fetchIncidents();
     fetchHospitals();
 
-    // Poll for new incidents every 3 seconds
+    // Har 3 second ma naya incidents poll garne (Poll for new incidents every 3 seconds)
     const intervalId = setInterval(fetchIncidents, 3000);
 
     return () => clearInterval(intervalId);
   }, [navigate]);
 
-  // Calculate distance in meters using Haversine formula
+  // Haversine formula use garera distance meter ma calculate garne (Calculate distance in meters using Haversine formula)
   const calculateDistanceMeters = useCallback((lat1, lon1, lat2, lon2) => {
-    const R = 6371000; // Earth's radius in meters
+    const R = 6371000; // Earth ko radius meter ma (Earth's radius in meters)
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLon = ((lon2 - lon1) * Math.PI) / 180;
     const a =
@@ -110,14 +110,14 @@ function AmbulanceUser() {
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    // Decrease by default of 10 meters, ensure non-negative
+    // Default 10 meter ghataera, non-negative ensure garne (Decrease by default of 10 meters, ensure non-negative)
     return Math.max(0, R * c - 30);
   }, []);
 
-  // Calculate nearest incident whenever location or incidents change (only if active)
+  // Location ya incidents change bhaye nearest incident calculate garne (active bhaye matra) (Calculate nearest incident whenever location or incidents change (only if active))
   useEffect(() => {
     if (!location || incidents.length === 0 || ambulanceStatus === "busy") {
-      if (ambulanceStatus === "busy") return; // Don't clear if busy
+      if (ambulanceStatus === "busy") return; // Busy bhaye clear nagarne (Don't clear if busy)
       setNearestIncident(null);
       setNearestDistance(null);
       setDistanceInMeters(null);
@@ -143,11 +143,11 @@ function AmbulanceUser() {
     });
 
     setNearestIncident(nearest);
-    setNearestDistance(minDistance / 111000); // Convert back to degrees for map
+    setNearestDistance(minDistance / 111000); // Map ko lagi degrees ma convert garne (Convert back to degrees for map)
     setDistanceInMeters(minDistance);
   }, [location, incidents, ambulanceStatus, calculateDistanceMeters]);
 
-  // Calculate distance to current incident when busy
+  // Busy bhaye current incident samma ko distance calculate garne (Calculate distance to current incident when busy)
   useEffect(() => {
     if (
       ambulanceStatus === "busy" &&
@@ -171,7 +171,7 @@ function AmbulanceUser() {
     calculateDistanceMeters,
   ]);
 
-  // Find nearest hospital
+  // Nearest hospital khojne (Find nearest hospital)
   const findNearestHospital = useCallback(() => {
     if (!location || hospitals.length === 0) return null;
 
@@ -220,7 +220,7 @@ function AmbulanceUser() {
         setLocationStatus("active");
         postLocationToBackend(coords, userNameParam);
 
-        // Watch position for continuous updates
+        // Continuous updates ko lagi position watch garne (Watch position for continuous updates)
         const watchId = navigator.geolocation.watchPosition(
           (newPosition) => {
             const updatedCoords = {
@@ -239,7 +239,7 @@ function AmbulanceUser() {
           { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 },
         );
 
-        // Cleanup watchPosition on unmount
+        // Unmount bhaye watchPosition cleanup garne (Cleanup watchPosition on unmount)
         return () => navigator.geolocation.clearWatch(watchId);
       },
       (error) => {
@@ -262,7 +262,7 @@ function AmbulanceUser() {
 
   const postLocationToBackend = async (coords, userNameParam) => {
     try {
-      // Use ambulanceData.id if available, else fallback to userNameParam or user
+      // AmbulanceData.id available bhaye use garne, else fallback to userNameParam or user (Use ambulanceData.id if available, else fallback to userNameParam or user)
       const ambulanceId =
         (ambulanceData && ambulanceData.id) || userNameParam || user;
       await updateAmbulanceLocation(
@@ -275,7 +275,7 @@ function AmbulanceUser() {
     }
   };
 
-  // Accept incident and change status to busy
+  // Incident accept garne ra status busy ma change garne (Accept incident and change status to busy)
   const handleAcceptIncident = async () => {
     if (nearestIncident) {
       setAmbulanceStatus("busy");
@@ -299,14 +299,14 @@ function AmbulanceUser() {
     }
   };
 
-  // Handle when ambulance reaches incident location
+  // Handle when ambulance reaches incident location (Ambulance incident location ma pugda handle garne)
   const handleReachedIncident = async () => {
     setShowCasualtyPopup(true);
     setCasualtyCount(0);
     setCasualties([]);
   };
 
-  // Handle casualty count change
+  // Handle casualty count change (Ghaitaharuko sankhya change handle garne)
   const handleCasualtyCountChange = (count) => {
     const num = parseInt(count) || 0;
     setCasualtyCount(num);
@@ -323,14 +323,14 @@ function AmbulanceUser() {
     );
   };
 
-  // Update individual casualty data
+  // Update individual casualty data (Individual casualty data update garne)
   const updateCasualtyData = (index, field, value) => {
     setCasualties((prev) =>
       prev.map((c, i) => (i === index ? { ...c, [field]: value } : c)),
     );
   };
 
-  // Submit casualty data and navigate to hospital
+  // Submit casualty data and navigate to hospital (Casualty data submit garera hospital ma navigate garne)
   const handleSubmitCasualties = async () => {
     // Post casualty data to backend
     try {
@@ -377,7 +377,7 @@ function AmbulanceUser() {
     setShowCasualtyPopup(false);
   };
 
-  // Handle when ambulance reaches hospital
+  // Handle when ambulance reaches hospital (Ambulance hospital ma pugda handle garne)
   const handleReachedHospital = async () => {
     setAmbulanceStatus("active");
     setCurrentIncident(null);
@@ -419,7 +419,7 @@ function AmbulanceUser() {
             <span className="font-bold text-primary tracking-tight text-xs md:text-base">
               EMS Response System
             </span>
-            {/* Ambulance Status Badge */}
+            {/* Ambulance Status Badge (Ambulance ko status badge) */}
             <div
               className={`ml-4 px-3 py-1 rounded-full text-xs font-bold ${
                 ambulanceStatus === "active"
@@ -431,7 +431,7 @@ function AmbulanceUser() {
             </div>
           </div>
           <div className="flex items-center gap-2 md:gap-6">
-            {/* Location Status Indicator */}
+            {/* Location Status Indicator (Location ko status indicator) */}
             <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg">
               <span
                 className={`w-2.5 h-2.5 rounded-full animate-pulse ${
@@ -451,7 +451,7 @@ function AmbulanceUser() {
               </span>
             </div>
 
-            {/* Location Error Alert */}
+            {/* Location Error Alert (Location error ko lagi alert) */}
             {locationError && (
               <div className="hidden lg:flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
                 <span className="material-symbols-outlined text-sm">error</span>
@@ -459,7 +459,7 @@ function AmbulanceUser() {
               </div>
             )}
 
-            {/* Got a Call Button - Manual casualty entry without map navigation */}
+            {/* Got a Call Button - Manual casualty entry without map navigation (Got a Call Button - Map navigation bina manual casualty entry) */}
             {ambulanceStatus === "active" && (
               <button
                 onClick={() => {
@@ -505,7 +505,7 @@ function AmbulanceUser() {
           </div>
         </header>
 
-        {/* Casualty Data Entry Popup */}
+        {/* Casualty Data Entry Popup (Casualty data entry ko lagi popup) */}
         {showCasualtyPopup && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
             <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
@@ -547,7 +547,7 @@ function AmbulanceUser() {
                   />
                 </div>
 
-                {/* Casualty Cards */}
+                {/* Casualty Cards (Casualty cards) */}
                 {casualties.length > 0 && (
                   <div className="space-y-3 sm:space-y-4">
                     {casualties.map((casualty, index) => (
@@ -675,7 +675,7 @@ function AmbulanceUser() {
                   </div>
                 )}
 
-                {/* Submit Button */}
+                {/* Submit Button (Submit button) */}
                 {casualties.length > 0 && (
                   <button
                     onClick={handleSubmitCasualties}
@@ -692,7 +692,7 @@ function AmbulanceUser() {
           </div>
         )}
 
-        {/* Hospital Navigation Banner */}
+        {/* Hospital Navigation Banner (Hospital navigation ko lagi banner) */}
         {isNavigatingToHospital && nearestHospital && (
           <div className="bg-blue-600 text-white px-3 sm:px-4 py-2 sm:py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
             <div className="flex items-center gap-2 sm:gap-3">
@@ -721,7 +721,7 @@ function AmbulanceUser() {
         )}
 
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-          {/* Show sidebar based on ambulance status */}
+          {/* Show sidebar based on ambulance status (Ambulance status ko adhar ma sidebar show garne) */}
           {ambulanceStatus === "active" && nearestIncident ? (
             <aside className="w-full md:w-80 bg-white border-b md:border-b-0 md:border-r border-slate-200 flex flex-col md:h-full shadow-lg z-10 max-h-[40vh] md:max-h-none overflow-y-auto">
               <div className="p-4 sm:p-6 border-b border-slate-100">
@@ -767,7 +767,7 @@ function AmbulanceUser() {
                       {nearestIncident.status}
                     </span>
                   </div>
-                  
+
                   <button
                     onClick={handleAcceptIncident}
                     className="w-full bg-red-600 text-white py-2 sm:py-3 rounded-lg font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm"
@@ -828,7 +828,7 @@ function AmbulanceUser() {
                     </span>
                   </div>
 
-                  {/* Reached Button - shows when within 5 meters */}
+                  {/* Reached Button - shows when within 5 meters (Reached Button - 5 meter bhitra huda show garne) */}
                   {isWithinProximity ? (
                     <button
                       onClick={handleReachedIncident}
@@ -848,7 +848,7 @@ function AmbulanceUser() {
               </div>
             </aside>
           ) : (
-            // Default sidebar - System Status (hidden on mobile when no incident)
+            // Default sidebar - System Status (hidden on mobile when no incident) (Default sidebar - System Status (mobile ma incident nabhaye hidden))
             <div className="hidden md:block absolute top-6 left-6 z-10 w-72 lg:w-80">
               <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-white/50 p-2 w-auto h-auto m-4">
                 <div className="flex items-center gap-3 mb-4">

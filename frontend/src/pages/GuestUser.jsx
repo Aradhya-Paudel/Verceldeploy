@@ -17,7 +17,7 @@ function GuestUser() {
   const userAvatarUrl =
     "https://lh3.googleusercontent.com/aida-public/AB6AXuAznK4Z6bAxZgs6fcy-L7t74V4PiEJ370LX_cCud0cr1VAc-o85wtbdeYFkWUGW10giLXaykhB_FlGKTV3iyz0PKJXRVrQ_rZcGWI-cwre6-yDLpWYagksKCsfl3nd67fFcdVWT7U-Jpa6Tl_l1Q9fHmut1hLpytx4-6eRhzAsihyrNG5IHPoQ9oukaQkyNRfgFes0jM4gnceJ2V7xjfh5xR4M3WkPMGd_JSgexHtXMRrZLnGSP0FUI3Ibt1GwPjrTioOKZ30ZQ9ms";
 
-  // Check if we're in a secure context (required for camera/location)
+  // Check if we're in a secure context (required for camera/location) (Camera/location ko lagi secure context check garne)
   const isSecureContext = window.isSecureContext;
 
   const startCameraStream = async () => {
@@ -142,7 +142,7 @@ function GuestUser() {
     setLoading(true);
 
     try {
-      // Report accident via API
+      // Report accident via API (API bata accident report garne)
       const result = await reportAccident({
         image: capturedImage,
         latitude: location.latitude,
@@ -183,7 +183,7 @@ function GuestUser() {
   return (
     <div className="bg-slate-50 text-slate-900 min-h-screen">
       <div className="max-w-lg mx-auto flex flex-col min-h-screen">
-        {/* Header */}
+        {/* Header (Header) */}
         <header className="h-14 sm:h-16 border-b border-slate-200 bg-white px-4 sm:px-6 flex items-center justify-between shrink-0 shadow-sm">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="bg-primary p-1.5 sm:p-2 rounded-lg text-white">
@@ -207,7 +207,7 @@ function GuestUser() {
           ></div>
         </header>
 
-        {/* Main Content */}
+        {/* Main Content (Main content) */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3 sm:p-4">
@@ -243,7 +243,7 @@ function GuestUser() {
             </div>
           )}
 
-          {/* Camera Preview or Captured Image */}
+          {/* Camera Preview or Captured Image (Camera preview ya captured image) */}
           <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
             {!capturedImage ? (
               <div className="relative aspect-video bg-black flex items-center justify-center">
@@ -269,7 +269,7 @@ function GuestUser() {
             <canvas ref={canvasRef} style={{ display: "none" }} />
           </div>
 
-          {/* Photo Capture Button */}
+          {/* Photo Capture Button (Photo capture button) */}
           {!capturedImage && (
             <button
               onClick={capturePhoto}
@@ -282,7 +282,7 @@ function GuestUser() {
             </button>
           )}
 
-          {/* Location Status */}
+          {/* Location Status (Location status) */}
           <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 shadow-sm">
             <div className="flex items-center justify-between mb-2 sm:mb-3">
               <h3 className="text-slate-900 font-bold text-xs sm:text-sm flex items-center gap-2">
@@ -324,7 +324,7 @@ function GuestUser() {
             )}
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons (Action buttons) */}
           <div className="space-y-2 sm:space-y-3">
             {!location && (
               <button
@@ -366,7 +366,7 @@ function GuestUser() {
             )}
           </div>
 
-          {/* Info Section */}
+          {/* Info Section (Info section) */}
           <div className="bg-slate-100 rounded-lg p-3 sm:p-4 text-[11px] sm:text-xs text-slate-600 space-y-2">
             <div className="flex gap-2">
               <span className="material-symbols-outlined text-sm text-primary shrink-0">

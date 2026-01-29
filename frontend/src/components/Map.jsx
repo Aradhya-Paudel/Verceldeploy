@@ -10,7 +10,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fix for default marker icons in Leaflet with webpack/vite
+// Leaflet ko default marker icons ko fix webpack/vite ma (Fix for default marker icons in Leaflet with webpack/vite)
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl:
@@ -21,7 +21,7 @@ L.Icon.Default.mergeOptions({
     "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 });
 
-// Custom ambulance icon
+// Custom ambulance icon banako (Custom ambulance icon)
 const ambulanceIcon = new L.DivIcon({
   className: "ambulance-marker",
   html: `
@@ -43,7 +43,7 @@ const ambulanceIcon = new L.DivIcon({
   popupAnchor: [0, -22],
 });
 
-// Custom incident icon
+// Custom incident icon banako (Custom incident icon)
 const createIncidentIcon = () => {
   return new L.DivIcon({
     className: "incident-marker",
@@ -68,7 +68,7 @@ const createIncidentIcon = () => {
   });
 };
 
-// Custom hospital icon
+// Custom hospital icon banako (Custom hospital icon)
 const createHospitalIcon = () => {
   return new L.DivIcon({
     className: "hospital-marker",
@@ -92,7 +92,7 @@ const createHospitalIcon = () => {
   });
 };
 
-// Component to handle map center updates
+// Map ko center update garne component (Component to handle map center updates)
 function MapCenterUpdater({ center }) {
   const map = useMap();
 
@@ -123,7 +123,7 @@ function Map({
 
   console.log("Map Center (defaultCenter):", defaultCenter);
 
-  // Calculate route from ambulance to target (incident or hospital) using OSRM
+  // Ambulance bata target (incident ya hospital) samma route calculate garne OSRM use garera (Calculate route from ambulance to target using OSRM)
   useEffect(() => {
     const calculateRouteWithOSRM = async () => {
       if (!ambulanceLocation) {
@@ -131,7 +131,7 @@ function Map({
         return;
       }
 
-      // Determine target: hospital takes priority, then incident
+      // Target decide garne: hospital priority hunchha, tyaspachi incident (Determine target: hospital takes priority, then incident)
       let target = null;
       if (
         targetHospital &&
@@ -159,17 +159,17 @@ function Map({
       }
 
       const ambulancePos = [
-        ambulanceLocation.longitude, // OSRM uses [lng, lat]
+        ambulanceLocation.longitude, // OSRM le [lng, lat] use garchha (OSRM uses [lng, lat])
         ambulanceLocation.latitude,
       ];
 
       const targetPos = [
-        target.longitude, // OSRM uses [lng, lat]
+        target.longitude, // OSRM le [lng, lat] use garchha (OSRM uses [lng, lat])
         target.latitude,
       ];
 
       try {
-        // Use OSRM public API for routing
+        // Routing ko lagi OSRM public API use garne (Use OSRM public API for routing)
         const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${ambulancePos[0]},${ambulancePos[1]};${targetPos[0]},${targetPos[1]}?overview=full&geometries=geojson`;
 
         const response = await fetch(osrmUrl);
@@ -177,7 +177,7 @@ function Map({
 
         if (data.routes && data.routes.length > 0) {
           const routeCoordinates = data.routes[0].geometry.coordinates.map(
-            ([lng, lat]) => [lat, lng], // Convert back to [lat, lng] for Leaflet
+            ([lng, lat]) => [lat, lng], // Leaflet ko lagi [lat, lng] ma convert garne (Convert back to [lat, lng] for Leaflet)
           );
           setRoute(routeCoordinates);
         } else {
@@ -185,7 +185,7 @@ function Map({
         }
       } catch (error) {
         console.error("Error fetching OSRM route:", error);
-        // Fallback to straight line if OSRM fails
+        // OSRM fail bhaye straight line ma fallback garne (Fallback to straight line if OSRM fails)
         setRoute([
           [ambulanceLocation.latitude, ambulanceLocation.longitude],
           [target.latitude, target.longitude],
@@ -229,10 +229,10 @@ function Map({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* Update map center when ambulance location changes */}
+        {/* Ambulance location change bhaye map center update garne (Update map center when ambulance location changes) */}
         <MapCenterUpdater center={ambulanceLocation ? mapCenter : null} />
 
-        {/* Ambulance Marker */}
+        {/* Ambulance ko marker (Ambulance Marker) */}
         {ambulanceLocation && (
           <Marker
             position={[ambulanceLocation.latitude, ambulanceLocation.longitude]}
@@ -256,7 +256,7 @@ function Map({
           </Marker>
         )}
 
-        {/* Incident Markers */}
+        {/* Incident ko markers (Incident Markers) */}
         {incidents.map((incident) => {
           if (!incident.latitude || !incident.longitude) return null;
 
@@ -292,7 +292,7 @@ function Map({
           );
         })}
 
-        {/* Route Line */}
+        {/* Route ko line (Route Line) */}
         {route.length >= 2 && (
           <Polyline
             positions={route}
@@ -305,7 +305,7 @@ function Map({
           />
         )}
 
-        {/* Target Hospital Marker */}
+        {/* Target Hospital ko marker (Target Hospital Marker) */}
         {targetHospital &&
           targetHospital.latitude &&
           targetHospital.longitude && (
@@ -339,7 +339,7 @@ function Map({
             </Marker>
           )}
 
-        {/* Nearest Incident Marker (when navigating to it) */}
+        {/* Nearest Incident ko marker (navigation garne bela) (Nearest Incident Marker when navigating) */}
         {nearestIncident &&
           nearestIncident.latitude &&
           nearestIncident.longitude &&

@@ -15,40 +15,40 @@ const {
   findBestHospital,
 } = require("../controllers/hospitalController");
 
-// GET /api/hospitals - Get all hospitals
+// GET /api/hospitals - Sabai hospital ko list paune (Get all hospitals)
 router.get("/", getAllHospitals);
 
-// POST /api/hospitals/find-best - Find best hospital for casualty
+// POST /api/hospitals/find-best - Casualty ko lagi best hospital khojne (Find best hospital for casualty)
 router.post("/find-best", findBestHospital);
 
-// GET /api/hospitals/by-name/:name - Get hospital by name
+// GET /api/hospitals/by-name/:name - Name le hospital khojne (Get hospital by name)
 router.get("/by-name/:name", getHospitalByName);
 
-// GET /api/hospitals/:id - Get hospital by ID
+// GET /api/hospitals/:id - ID le hospital khojne (Get hospital by ID)
 router.get("/:id", getHospital);
 
-// GET /api/hospitals/:id/dashboard - Get hospital dashboard data
+// GET /api/hospitals/:id/dashboard - Hospital ko dashboard data paune (Get hospital dashboard data)
 router.get("/:id/dashboard", getHospitalDashboard);
 
-// GET /api/hospitals/:id/fleet - Get hospital ambulances
+// GET /api/hospitals/:id/fleet - Hospital ko ambulance haru paune (Get hospital ambulances)
 router.get("/:id/fleet", getHospitalFleet);
 
-// GET /api/hospitals/:id/blood-inventory - Get blood inventory
+// GET /api/hospitals/:id/blood-inventory - Hospital ko blood inventory paune (Get blood inventory)
 router.get("/:id/blood-inventory", getBloodInventory);
 
-// GET /api/hospitals/:id/staff - Get staff
+// GET /api/hospitals/:id/staff - Hospital ko staff paune (Get staff)
 router.get("/:id/staff", getStaff);
 
-// PATCH /api/hospitals/:id/beds - Update beds
+// PATCH /api/hospitals/:id/beds - Hospital ko beds update garne (Update beds)
 router.patch("/:id/beds", updateBeds);
 
-// PATCH /api/hospitals/:id/blood-inventory - Update blood inventory
+// PATCH /api/hospitals/:id/blood-inventory - Blood inventory update garne (Update blood inventory)
 router.patch("/:id/blood-inventory", updateBloodInventory);
 
-// PATCH /api/hospitals/:id/staff - Update staff
+// PATCH /api/hospitals/:id/staff - Staff update garne (Update staff)
 router.patch("/:id/staff", updateStaff);
 
-// PATCH /api/hospitals/:id/ambulance-count - Update ambulance count
+// PATCH /api/hospitals/:id/ambulance-count - Ambulance count update garne (Update ambulance count)
 router.patch("/:id/ambulance-count", updateAmbulanceCount);
 
 module.exports = router;

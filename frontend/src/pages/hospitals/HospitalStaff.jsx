@@ -13,7 +13,7 @@ function HospitalStaff() {
   const userAvatarUrl =
     "https://lh3.googleusercontent.com/aida-public/AB6AXuAznK4Z6bAxZgs6fcy-L7t74V4PiEJ370LX_cCud0cr1VAc-o85wtbdeYFkWUGW10giLXaykhB_FlGKTV3iyz0PKJXRVrQ_rZcGWI-cwre6-yDLpWYagksKCsfl3nd67fFcdVWT7U-Jpa6Tl_l1Q9fHmut1hLpytx4-6eRhzAsihyrNG5IHPoQ9oukaQkyNRfgFes0jM4gnceJ2V7xjfh5xR4M3WkPMGd_JSgexHtXMRrZLnGSP0FUI3Ibt1GwPjrTioOKZ30ZQ9ms";
 
-  // Icons for each specialist category
+  // Icons for each specialist category (Har specialist category ko lagi icons)
   const staffIcons = {
     Cardiologist: "cardiology",
     Neurologist: "neurology",
@@ -44,7 +44,7 @@ function HospitalStaff() {
     navigate("/", { replace: true });
   };
 
-  // Load hospital data from API based on localStorage userName
+  // Load hospital data from API based on localStorage userName (localStorage userName ko adhar ma API bata hospital data load garne)
   useEffect(() => {
     const loadHospitalData = async () => {
       try {
@@ -139,7 +139,7 @@ function HospitalStaff() {
   return (
     <div className="Main bg-slate-50 text-slate-900">
       <div className="flex h-screen overflow-hidden">
-        {/* Mobile sidebar overlay */}
+        {/* Mobile sidebar overlay (Mobile sidebar overlay) */}
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -147,7 +147,7 @@ function HospitalStaff() {
           />
         )}
 
-        {/* Sidebar */}
+        {/* Sidebar (Sidebar) */}
         <aside
           className={`
           fixed lg:static inset-y-0 left-0 z-50

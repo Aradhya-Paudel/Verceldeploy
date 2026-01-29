@@ -5,12 +5,12 @@ function IsAuthenticated({ children, allowedRoles = [] }) {
   const isAuth = isAdminLoggedIn();
   const userType = localStorage.getItem("userType");
 
-  // Not logged in - redirect to login
+  // Not logged in - redirect to login (Login nabhaye login ma redirect garne)
   if (!isAuth) {
     return <Navigate to="/" replace />;
   }
 
-  // Check role-based access if roles are specified
+  // Check role-based access if roles are specified (Roles specify bhaye role-based access check garne)
   if (allowedRoles.length > 0 && !allowedRoles.includes(userType)) {
     // Redirect to appropriate dashboard based on user type
     if (userType === "hospital") {

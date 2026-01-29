@@ -42,7 +42,7 @@ const apiRequest = async (endpoint, options = {}) => {
     try {
       data = await response.json();
     } catch (jsonErr) {
-      // If not JSON, return status and text
+      // JSON na bhaye status ra text return garne (If not JSON, return status and text)
       const text = await response.text();
       return {
         success: false,
@@ -50,15 +50,15 @@ const apiRequest = async (endpoint, options = {}) => {
         status: response.status,
       };
     }
-    return data; // Return the full response as-is from backend
+    return data; // Backend bata aako full response as-is return garne (Return the full response as-is from backend)
   } catch (error) {
-    // Log more details for production debugging
+    // Production debugging ko lagi aru details log garne (Log more details for production debugging)
     console.error(`API Error [${endpoint}]:`, error, options);
     return { success: false, error: error.message, endpoint, options };
   }
 };
 
-// ==================== AUTHENTICATION ====================
+// ==================== AUTHENTICATION ==================== (Pramanikaran)
 
 /**
  * Login ambulance
@@ -100,7 +100,7 @@ export const hospitalLogin = async (name, password) => {
   };
 };
 
-// ==================== AMBULANCES ====================
+// ==================== AMBULANCES ==================== (Ambulanceharu)
 
 /**
  * Get all ambulances
@@ -263,7 +263,7 @@ export const completeTransport = async (id) => {
   return response;
 };
 
-// ==================== ACCIDENTS ====================
+// ==================== ACCIDENTS ==================== (Durbhagya)
 
 /**
  * Report new accident
@@ -335,7 +335,7 @@ export const updateAccidentStatus = async (id, status) => {
   return response;
 };
 
-// ==================== CASUALTIES ====================
+// ==================== CASUALTIES ==================== (Ghaitaharuko sankhya)
 
 /**
  * Add casualty to accident
@@ -415,7 +415,7 @@ export const findBestHospital = async (params) => {
   return { success: false, error: response.error };
 };
 
-// ==================== HOSPITALS ====================
+// ==================== HOSPITALS ==================== (Hospitalharu)
 
 /**
  * Get all hospitals
@@ -565,7 +565,7 @@ export const updateHospitalStaff = async (id, staffCount) => {
   return response;
 };
 
-// ==================== BLOOD REQUESTS ====================
+// ==================== BLOOD REQUESTS ==================== (Rakta anurodh)
 
 /**
  * Create blood request
@@ -662,7 +662,7 @@ export const completeBloodTransfer = async (requestId) => {
   return response;
 };
 
-// ==================== BLOOD ALERTS ====================
+// ==================== BLOOD ALERTS ==================== (Rakta chetawani)
 
 /**
  * Send blood alert to nearest hospital
@@ -673,16 +673,22 @@ export const completeBloodTransfer = async (requestId) => {
  * @param {object} casualtyInfo - Optional casualty details
  * @returns {Promise<object>} - { success, data, error }
  */
-export const sendBloodAlertToNearest = async (bestHospitalId, bloodType, unitsNeeded, urgency = 'urgent', casualtyInfo = null) => {
-  const response = await apiRequest('/blood-alerts/send-alert', {
-    method: 'POST',
+export const sendBloodAlertToNearest = async (
+  bestHospitalId,
+  bloodType,
+  unitsNeeded,
+  urgency = "urgent",
+  casualtyInfo = null,
+) => {
+  const response = await apiRequest("/blood-alerts/send-alert", {
+    method: "POST",
     body: JSON.stringify({
       bestHospitalId,
       bloodType,
       unitsNeeded,
       urgency,
-      casualtyInfo
-    })
+      casualtyInfo,
+    }),
   });
   return response;
 };
@@ -704,9 +710,12 @@ export const getBloodAlerts = async (hospitalId) => {
  * @returns {Promise<object>} - { success, alert }
  */
 export const acceptBloodAlert = async (hospitalId, alertId) => {
-  const response = await apiRequest(`/blood-alerts/${hospitalId}/${alertId}/accept`, {
-    method: 'PATCH'
-  });
+  const response = await apiRequest(
+    `/blood-alerts/${hospitalId}/${alertId}/accept`,
+    {
+      method: "PATCH",
+    },
+  );
   return response;
 };
 
@@ -717,15 +726,18 @@ export const acceptBloodAlert = async (hospitalId, alertId) => {
  * @param {string} reason - Rejection reason
  * @returns {Promise<object>} - { success, alert }
  */
-export const rejectBloodAlert = async (hospitalId, alertId, reason = '') => {
-  const response = await apiRequest(`/blood-alerts/${hospitalId}/${alertId}/reject`, {
-    method: 'PATCH',
-    body: JSON.stringify({ reason })
-  });
+export const rejectBloodAlert = async (hospitalId, alertId, reason = "") => {
+  const response = await apiRequest(
+    `/blood-alerts/${hospitalId}/${alertId}/reject`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ reason }),
+    },
+  );
   return response;
 };
 
-// ==================== UTILITY ====================
+// ==================== UTILITY ==================== (Upayogita)
 
 /**
  * Health check
@@ -737,10 +749,10 @@ export const healthCheck = async () => {
 };
 
 export default {
-  // Auth
+  // Auth (Pramanikaran)
   ambulanceLogin,
   hospitalLogin,
-  // Ambulances
+  // Ambulances (Ambulanceharu)
   getAllAmbulances,
   getAvailableAmbulances,
   getAmbulanceById,
@@ -751,20 +763,20 @@ export default {
   arriveAtScene,
   startTransport,
   completeTransport,
-  // Accidents
+  // Accidents (Durbhagya)
   reportAccident,
   getAllAccidents,
   getPendingAccidents,
   getAccidentById,
   updateAccidentStatus,
   removeAccident,
-  // Casualties
+  // Casualties (Ghaitaharuko sankhya)
   addCasualty,
   getHospitalRecommendations,
   getCasualtiesForAccident,
   updateCasualtyStatus,
   findBestHospital,
-  // Hospitals
+  // Hospitals (Hospitalharu)
   getAllHospitals,
   getHospitalById,
   getHospitalByName,
@@ -776,7 +788,7 @@ export default {
   updateBloodInventory,
   updateHospitalAmbulanceCount,
   updateHospitalStaff,
-  // Blood Requests
+  // Blood Requests (Rakta anurodh)
   createBloodRequest,
   getAllBloodRequests,
   getBloodRequestById,
@@ -784,11 +796,11 @@ export default {
   approveBloodRequest,
   declineBloodRequest,
   completeBloodTransfer,
-  // Blood Alerts
+  // Blood Alerts (Rakta chetawani)
   sendBloodAlertToNearest,
   getBloodAlerts,
   acceptBloodAlert,
   rejectBloodAlert,
-  // Utility
+  // Utility (Upayogita)
   healthCheck,
 };

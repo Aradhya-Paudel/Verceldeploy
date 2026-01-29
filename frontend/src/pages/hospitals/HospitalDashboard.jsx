@@ -19,7 +19,7 @@ function HospitalDashboard() {
     navigate("/", { replace: true });
   };
 
-  // Load hospital data from API based on localStorage userName
+  // Load hospital data from API based on localStorage userName (localStorage userName ko adhar ma API bata hospital data load garne)
   useEffect(() => {
     const loadHospitalData = async () => {
       try {
@@ -72,7 +72,7 @@ function HospitalDashboard() {
   return (
     <div className="Main bg-slate-50 text-slate-900">
       <div className="flex h-screen overflow-hidden">
-        {/* Mobile sidebar overlay */}
+        {/* Mobile sidebar overlay (Mobile sidebar overlay) */}
         {sidebarOpen && (
           <div
             className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -80,7 +80,7 @@ function HospitalDashboard() {
           />
         )}
 
-        {/* Sidebar */}
+        {/* Sidebar (Sidebar) */}
         <aside
           className={`
           fixed lg:static inset-y-0 left-0 z-50

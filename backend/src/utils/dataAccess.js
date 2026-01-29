@@ -1,4 +1,5 @@
 /**
+ * Accident ko ID diyera teslai remove garne function
  * Remove accident by ID
  * @param {string} id - Accident ID
  * @returns {boolean} Success status
@@ -17,6 +18,7 @@ const path = require("path");
 const dataDir = path.join(__dirname, "../../data");
 
 /**
+ * JSON file padhne ra object ma convert garne function
  * Read JSON file and return parsed data
  * @param {string} filename - Name of the JSON file
  * @returns {Object} Parsed JSON data
@@ -33,6 +35,7 @@ const readJSON = (filename) => {
 };
 
 /**
+ * Data JSON file ma lekhne function
  * Write data to JSON file
  * @param {string} filename - Name of the JSON file
  * @param {Object} data - Data to write
@@ -50,6 +53,7 @@ const writeJSON = (filename, data) => {
 };
 
 /**
+ * Sabai hospital ko list paune function
  * Get all hospitals
  * @returns {Array} Array of hospitals
  */
@@ -59,6 +63,7 @@ const getHospitals = () => {
 };
 
 /**
+ * Hospital ko ID diyera tyo hospital ko data paune function
  * Get hospital by ID
  * @param {number} id - Hospital ID
  * @returns {Object|null} Hospital object or null
@@ -69,6 +74,7 @@ const getHospitalById = (id) => {
 };
 
 /**
+ * Hospital ko name diyera tyo hospital ko data paune function (login ko lagi)
  * Get hospital by name (for login)
  * @param {string} name - Hospital name
  * @returns {Object|null} Hospital object or null
@@ -81,6 +87,7 @@ const getHospitalByName = (name) => {
 };
 
 /**
+ * Hospital ko data update garne function
  * Update hospital data
  * @param {number} id - Hospital ID
  * @param {Object} updates - Updates to apply
@@ -97,6 +104,7 @@ const updateHospital = (id, updates) => {
 };
 
 /**
+ * Sabai ambulance ko list paune function
  * Get all ambulances
  * @returns {Array} Array of ambulances
  */
@@ -106,6 +114,7 @@ const getAmbulances = () => {
 };
 
 /**
+ * Ambulance ko ID ya name diyera tyo ambulance ko data paune function
  * Get ambulance by ID or name
  * @param {string} idOrName - Ambulance ID or name
  * @returns {Object|null} Ambulance object or null
@@ -113,10 +122,13 @@ const getAmbulances = () => {
 const getAmbulanceById = (idOrName) => {
   const ambulances = getAmbulances();
   // First try to find by ID, then fall back to name
-  return ambulances.find((a) => a.id === idOrName || a.name === idOrName) || null;
+  return (
+    ambulances.find((a) => a.id === idOrName || a.name === idOrName) || null
+  );
 };
 
 /**
+ * Ambulance ko name diyera tyo ambulance ko data paune function (login ko lagi)
  * Get ambulance by name (for login)
  * @param {string} name - Ambulance name
  * @returns {Object|null} Ambulance object or null
@@ -127,6 +139,7 @@ const getAmbulanceByName = (name) => {
 };
 
 /**
+ * Ambulance ko data update garne function
  * Update ambulance data
  * @param {string} idOrName - Ambulance ID or name
  * @param {Object} updates - Updates to apply
@@ -135,7 +148,9 @@ const getAmbulanceByName = (name) => {
 const updateAmbulance = (idOrName, updates) => {
   const data = readJSON("ambulances.json");
   // Find by ID first, then fall back to name
-  const index = data.ambulances.findIndex((a) => a.id === idOrName || a.name === idOrName);
+  const index = data.ambulances.findIndex(
+    (a) => a.id === idOrName || a.name === idOrName,
+  );
   if (index === -1) return null;
 
   data.ambulances[index] = { ...data.ambulances[index], ...updates };
@@ -144,6 +159,7 @@ const updateAmbulance = (idOrName, updates) => {
 };
 
 /**
+ * Available ambulance haru matra paune function
  * Get available ambulances
  * @returns {Array} Array of available ambulances
  */
@@ -153,6 +169,7 @@ const getAvailableAmbulances = () => {
 };
 
 /**
+ * Sabai active accident haru paune function
  * Get all active accidents
  * @returns {Array} Array of accidents
  */
@@ -162,6 +179,7 @@ const getAccidents = () => {
 };
 
 /**
+ * Naya accident add garne function
  * Add new accident
  * @param {Object} accident - Accident data
  * @returns {Object} Created accident
@@ -180,6 +198,7 @@ const addAccident = (accident) => {
 };
 
 /**
+ * Accident ko data update garne function
  * Update accident data
  * @param {string} id - Accident ID
  * @param {Object} updates - Updates to apply
@@ -196,6 +215,7 @@ const updateAccident = (id, updates) => {
 };
 
 /**
+ * Accident ko ID diyera tyo accident ko data paune function
  * Get accident by ID
  * @param {string} id - Accident ID
  * @returns {Object|null} Accident object or null
@@ -206,6 +226,7 @@ const getAccidentById = (id) => {
 };
 
 /**
+ * Sabai casualty haru paune function
  * Get all casualties
  * @returns {Array} Array of casualties
  */
@@ -215,6 +236,7 @@ const getCasualties = () => {
 };
 
 /**
+ * Naya casualty add garne function
  * Add new casualty
  * @param {Object} casualty - Casualty data
  * @returns {Object} Created casualty
@@ -232,6 +254,7 @@ const addCasualty = (casualty) => {
 };
 
 /**
+ * Casualty ko data update garne function
  * Update casualty data
  * @param {string} id - Casualty ID
  * @param {Object} updates - Updates to apply
@@ -248,6 +271,7 @@ const updateCasualty = (id, updates) => {
 };
 
 /**
+ * Accident ID diyera tyo accident sanga related sabai casualty paune function
  * Get casualties by accident ID
  * @param {string} accidentId - Accident ID
  * @returns {Array} Array of casualties
@@ -258,6 +282,7 @@ const getCasualtiesByAccidentId = (accidentId) => {
 };
 
 /**
+ * Sabai blood request haru paune function
  * Get all blood requests
  * @returns {Array} Array of blood requests
  */
@@ -267,6 +292,7 @@ const getBloodRequests = () => {
 };
 
 /**
+ * Naya blood request add garne function
  * Add new blood request
  * @param {Object} request - Blood request data
  * @returns {Object} Created blood request
@@ -285,6 +311,7 @@ const addBloodRequest = (request) => {
 };
 
 /**
+ * Blood request ko data update garne function
  * Update blood request
  * @param {string} id - Blood request ID
  * @param {Object} updates - Updates to apply
@@ -301,6 +328,7 @@ const updateBloodRequest = (id, updates) => {
 };
 
 /**
+ * Blood request ko ID diyera tyo request ko data paune function
  * Get blood request by ID
  * @param {string} id - Blood request ID
  * @returns {Object|null} Blood request or null
@@ -311,6 +339,7 @@ const getBloodRequestById = (id) => {
 };
 
 /**
+ * Sabai submission haru paune function
  * Get all submissions
  * @returns {Array} Array of submissions
  */
@@ -320,6 +349,7 @@ const getSubmissions = () => {
 };
 
 /**
+ * Naya submission add garne function
  * Add new submission
  * @param {Object} submission - Submission data
  * @returns {Object} Created submission
@@ -338,6 +368,7 @@ const addSubmission = (submission) => {
 };
 
 /**
+ * Submission ko data update garne function
  * Update submission
  * @param {string} id - Submission ID
  * @param {Object} updates - Updates to apply

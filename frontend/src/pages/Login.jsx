@@ -12,7 +12,7 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Redirect if already logged in
+  // Redirect if already logged in (Already logged in bhaye redirect garne)
   useEffect(() => {
     const isAuth = localStorage.getItem("adminAuth");
     const userType = localStorage.getItem("userType");
@@ -53,7 +53,7 @@ function Login() {
     setLoading(true);
 
     try {
-      // Try hospital login first
+      // Try hospital login first (Pahile hospital login try garne)
       const hospitalResult = await hospitalLogin(user.trim(), password);
       if (hospitalResult.success) {
         localStorage.setItem("adminAuth", "true");
@@ -67,7 +67,7 @@ function Login() {
         return;
       }
 
-      // Try ambulance login
+      // Try ambulance login (Ambulance login try garne)
       const ambulanceResult = await ambulanceLogin(user.trim(), password);
       if (ambulanceResult.success) {
         localStorage.setItem("adminAuth", "true");
@@ -81,7 +81,7 @@ function Login() {
         return;
       }
 
-      // No match found
+      // No match found (Match bhayena)
       setError("Invalid username or password. Please try again.");
       setPassword("");
     } catch (err) {
@@ -119,7 +119,7 @@ function Login() {
               </h1>
             </div>
             <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit}>
-              {/* Error Message */}
+              {/* Error Message (Error message) */}
               {error && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-2.5 sm:p-3 flex items-start sm:items-center gap-2">
                   <span className="material-symbols-outlined text-red-600 text-base sm:text-lg shrink-0 mt-0.5 sm:mt-0">

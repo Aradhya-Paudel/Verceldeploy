@@ -6,18 +6,18 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+// Middleware haru rakheko (Express app ma use garne middlewares)
 app.use(cors());
 app.use(bodyParser.json({ limit: "10mb" }));
 app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
 
-// Request logging middleware
+// Yo middleware le sabai request log garxa (Request logging middleware)
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
   next();
 });
 
-// Health check route
+// Health check garne route (API running xa ki xaina check garne)
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
@@ -30,7 +30,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Routes
+// Sabai API routes yaha import gareko (All API routes are imported here)
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/accidents", require("./routes/accidentRoutes"));
 app.use("/api/ambulances", require("./routes/ambulanceRoutes"));
@@ -39,7 +39,7 @@ app.use("/api/casualties", require("./routes/casualtyRoutes"));
 app.use("/api/blood", require("./routes/bloodRoutes"));
 app.use("/api/blood-alerts", require("./routes/bloodAlertRoutes"));
 
-// 404 handler
+// 404 handler (Route na bhaye error return garne)
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -48,7 +48,7 @@ app.use((req, res) => {
   });
 });
 
-// Error handler
+// Error handler (Server ma error aayo bhane yaha handle garne)
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
