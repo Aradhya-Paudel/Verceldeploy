@@ -58,7 +58,7 @@ const apiRequest = async (endpoint, options = {}) => {
   }
 };
 
-// ==================== AUTHENTICATION ==================== (Pramanikaran)
+
 
 /**
  * Login ambulance
