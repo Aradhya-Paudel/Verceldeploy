@@ -106,13 +106,14 @@ const getAmbulances = () => {
 };
 
 /**
- * Get ambulance by ID
- * @param {string} id - Ambulance ID
+ * Get ambulance by ID or name
+ * @param {string} idOrName - Ambulance ID or name
  * @returns {Object|null} Ambulance object or null
  */
-const getAmbulanceById = (id) => {
+const getAmbulanceById = (idOrName) => {
   const ambulances = getAmbulances();
-  return ambulances.find((a) => a.id === id) || null;
+  // First try to find by ID, then fall back to name
+  return ambulances.find((a) => a.id === idOrName || a.name === idOrName) || null;
 };
 
 /**
@@ -127,13 +128,14 @@ const getAmbulanceByName = (name) => {
 
 /**
  * Update ambulance data
- * @param {string} id - Ambulance ID
+ * @param {string} idOrName - Ambulance ID or name
  * @param {Object} updates - Updates to apply
  * @returns {Object|null} Updated ambulance or null
  */
-const updateAmbulance = (id, updates) => {
+const updateAmbulance = (idOrName, updates) => {
   const data = readJSON("ambulances.json");
-  const index = data.ambulances.findIndex((a) => a.id === id);
+  // Find by ID first, then fall back to name
+  const index = data.ambulances.findIndex((a) => a.id === idOrName || a.name === idOrName);
   if (index === -1) return null;
 
   data.ambulances[index] = { ...data.ambulances[index], ...updates };

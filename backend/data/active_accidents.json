@@ -1,32 +1,6 @@
 {
   "accidents": [
     {
-      "id": "ACC-UNDEL-001",
-      "title": "Major Highway Collision",
-      "description": "Multiple vehicles involved, severe injuries reported.",
-      "latitude": 28.2101,
-      "longitude": 83.9775,
-      "location": "Highway 1, Sector 5",
-      "undeletable": true,
-      "status": "pending",
-      "assignedAmbulance": null,
-      "casualties": [],
-      "createdAt": "2026-01-28T10:00:00.000Z"
-    },
-    {
-      "id": "ACC-UNDEL-002",
-      "title": "School Bus Accident",
-      "description": "School bus overturned, children injured.",
-      "latitude": 28.2112,
-      "longitude": 83.9786,
-      "location": "Main Street, Near Central School",
-      "undeletable": true,
-      "status": "pending",
-      "assignedAmbulance": null,
-      "casualties": [],
-      "createdAt": "2026-01-28T10:10:00.000Z"
-    },
-    {
       "id": "ACC-UNDEL-003",
       "title": "Factory Explosion",
       "description": "Explosion at chemical factory, fire ongoing.",

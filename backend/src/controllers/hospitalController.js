@@ -683,6 +683,29 @@ const findBestHospital = (req, res) => {
 
     const { password, ...safeHospital } = bestHospital;
 
+    // Calculate nearest hospital to the best hospital
+    let minDist = Infinity;
+    let nearest = null;
+    scoredHospitals.forEach((hospital) => {
+      if (hospital.id !== bestHospital.id) {
+        const dist = calculateDistance(
+          bestHospital.latitude,
+          bestHospital.longitude,
+          hospital.latitude,
+          hospital.longitude,
+        );
+        if (dist < minDist) {
+          minDist = dist;
+          nearest = hospital;
+        }
+      }
+    });
+    if (nearest) {
+      console.log("Nearest hospital to the best hospital:", nearest);
+    } else {
+      console.log("No nearest hospital found for the best hospital.");
+    }
+
     return res.status(200).json({
       success: true,
       message: "Best hospital found",

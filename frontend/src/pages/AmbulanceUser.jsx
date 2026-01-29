@@ -33,7 +33,7 @@ function AmbulanceUser() {
   const [isNavigatingToHospital, setIsNavigatingToHospital] = useState(false);
   const [distanceInMeters, setDistanceInMeters] = useState(null);
 
-  const PROXIMITY_THRESHOLD = 20;
+  const PROXIMITY_THRESHOLD = 30;
 
   useEffect(() => {
     const userName = localStorage.getItem("userName");
@@ -279,27 +279,23 @@ function AmbulanceUser() {
       // Post status to backend
       try {
         await updateAmbulanceStatus(user, "busy", nearestIncident.id);
+        // Remove the current incident from active accidents in backend
+        await removeAccident(nearestIncident.id);
+        // Optionally, update local state to remove the incident from the list
+        setIncidents((prev) =>
+          prev.filter((inc) => inc.id !== nearestIncident.id),
+        );
       } catch (error) {
-        console.error("Error updating ambulance status:", error);
+        console.error(
+          "Error updating ambulance status or removing accident:",
+          error,
+        );
       }
     }
   };
 
   // Handle when ambulance reaches incident location
   const handleReachedIncident = async () => {
-    // Remove the current incident from active accidents in backend
-    if (currentIncident && currentIncident.id) {
-      try {
-        // Call the removeAccident API (assume it exists in services/api.js)
-        await removeAccident(currentIncident.id);
-        // Optionally, update local state to remove the incident from the list
-        setIncidents((prev) =>
-          prev.filter((inc) => inc.id !== currentIncident.id),
-        );
-      } catch (error) {
-        console.error("Error removing accident:", error);
-      }
-    }
     setShowCasualtyPopup(true);
     setCasualtyCount(0);
     setCasualties([]);
@@ -766,16 +762,7 @@ function AmbulanceUser() {
                       {nearestIncident.status}
                     </span>
                   </div>
-                  <div className="bg-linear-to-r from-blue-50 to-blue-100 rounded-lg p-2 flex items-center justify-between mb-3 sm:mb-4">
-                    <span className="text-[10px] sm:text-xs font-semibold text-blue-900">
-                      Distance:
-                    </span>
-                    <span className="text-xs sm:text-sm font-bold text-blue-600">
-                      {distanceInMeters
-                        ? `${distanceInMeters.toFixed(0)}m`
-                        : "Calculating..."}
-                    </span>
-                  </div>
+                  
                   <button
                     onClick={handleAcceptIncident}
                     className="w-full bg-red-600 text-white py-2 sm:py-3 rounded-lg font-bold hover:bg-red-700 transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm"

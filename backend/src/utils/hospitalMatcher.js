@@ -139,6 +139,53 @@ const calculateBedsScore = (hospital) => {
 };
 
 /**
+ * Find the hospital nearest to a given hospital (excluding itself)
+ * @param {Array} hospitals - Array of hospital objects
+ * @param {Object} referenceHospital - The hospital to find the nearest to
+ * @returns {Object|null} The nearest hospital object or null if not found
+ */
+const findNearestHospitalToHospital = (hospitals, referenceHospital) => {
+  if (!referenceHospital || !hospitals || hospitals.length === 0) return null;
+  
+  let minDist = Infinity;
+  let nearest = null;
+  
+  hospitals.forEach((hospital) => {
+    if (hospital.id !== referenceHospital.id) {
+      const dist = calculateDistance(
+        referenceHospital.latitude,
+        referenceHospital.longitude,
+        hospital.latitude,
+        hospital.longitude,
+      );
+      if (dist < minDist) {
+        minDist = dist;
+        nearest = hospital;
+      }
+    }
+  });
+  
+  // Console log when nearest hospital is found
+  if (nearest) {
+    console.log("=== NEAREST HOSPITAL FOUND ===");
+    console.log("Reference Hospital:", {
+      id: referenceHospital.id,
+      name: referenceHospital.name
+    });
+    console.log("Nearest Hospital:", {
+      id: nearest.id,
+      name: nearest.name,
+      address: nearest.address,
+      phone: nearest.phone,
+      distance: `${Math.round(minDist * 100) / 100} km`
+    });
+    console.log("==============================");
+  }
+  
+  return nearest;
+};
+
+/**
  * Find best matching hospital for a casualty
  * @param {Array} hospitals - Array of hospitals
  * @param {Object} casualtyInfo - Casualty information
@@ -209,7 +256,7 @@ const findBestHospital = (
     // Find nearest hospital to the best hospital
     const nearestToBest = findNearestHospitalToHospital(
       hospitals,
-      best.hospital
+      best.hospital,
     );
     if (nearestToBest) {
       console.log("Nearest hospital to the best hospital:", nearestToBest);
@@ -281,35 +328,7 @@ const rankHospitals = (hospitals, casualtyInfo, accidentLat, accidentLon) => {
 
   // Sort by total score (descending)
   scoredHospitals.sort((a, b) => b.scores.total - a.scores.total);
-
   return scoredHospitals;
-};
-
-/**
- * Find the hospital nearest to a given hospital (excluding itself)
- * @param {Array} hospitals - Array of hospital objects
- * @param {Object} referenceHospital - The hospital to find the nearest to
- * @returns {Object|null} The nearest hospital object or null if not found
- */
-const findNearestHospitalToHospital = (hospitals, referenceHospital) => {
-  if (!referenceHospital || !hospitals || hospitals.length === 0) return null;
-  let minDist = Infinity;
-  let nearest = null;
-  hospitals.forEach((hospital) => {
-    if (hospital.id !== referenceHospital.id) {
-      const dist = calculateDistance(
-        referenceHospital.latitude,
-        referenceHospital.longitude,
-        hospital.latitude,
-        hospital.longitude,
-      );
-      if (dist < minDist) {
-        minDist = dist;
-        nearest = hospital;
-      }
-    }
-  });
-  return nearest;
 };
 
 module.exports = {
