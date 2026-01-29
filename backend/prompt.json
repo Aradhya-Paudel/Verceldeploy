@@ -1,0 +1,251 @@
+{
+  "task": "Send Blood Alert to Nearest Hospital",
+  "description": "When a hospital needs blood urgently, automatically find the nearest hospital and send them a blood request alert",
+  
+  "implementation_steps": [
+    {
+      "step": 1,
+      "action": "Create New API Endpoint",
+      "file": "backend/src/routes/bloodRequests.js",
+      "method": "POST",
+      "endpoint": "/api/blood-requests/alert-nearest",
+      "description": "Add a new route to handle automatic nearest hospital blood alerts"
+    },
+    {
+      "step": 2,
+      "action": "Create Controller Function",
+      "file": "backend/src/controllers/bloodRequestController.js",
+      "function_name": "alertNearestHospital",
+      "logic": [
+        "Receive request with: hospitalId, bloodType, unitsNeeded, urgency",
+        "Load all hospitals from hospitals.json",
+        "Find requesting hospital by ID",
+        "Use findNearestHospitalToHospital() to get nearest hospital",
+        "Check if nearest hospital has required blood in inventory",
+        "If no blood available, find next nearest hospital with blood",
+        "Create blood request record with auto-generated ID",
+        "Save to bloodRequests.json",
+        "Return success response with nearest hospital details"
+      ]
+    },
+    {
+      "step": 3,
+      "action": "Add Frontend API Function",
+      "file": "src/services/api.js",
+      "function_name": "sendBloodAlertToNearest",
+      "parameters": {
+        "hospitalId": "number - ID of hospital requesting blood",
+        "bloodType": "string - Blood type needed (e.g., 'A+', 'O-')",
+        "unitsNeeded": "number - Liters/units of blood required",
+        "urgency": "string - 'normal' | 'urgent' | 'critical'"
+      },
+      "returns": {
+        "success": "boolean",
+        "bloodRequest": "object - Created blood request",
+        "nearestHospital": "object - Details of nearest hospital",
+        "distance": "number - Distance in km",
+        "bloodAvailable": "boolean - Whether hospital has the blood"
+      }
+    },
+    {
+      "step": 4,
+      "action": "Add UI Component",
+      "file": "src/pages/hospitals/HospitalInventory.jsx",
+      "ui_elements": [
+        "Add 'Request Blood' button in blood inventory section",
+        "Create modal/form to input: blood type, units needed, urgency level",
+        "On submit, call sendBloodAlertToNearest() API",
+        "Show success message with nearest hospital name and distance",
+        "Show error if no nearby hospitals have the blood",
+        "Display pending request status"
+      ]
+    },
+    {
+      "step": 5,
+      "action": "Update Hospital Dashboard",
+      "file": "src/pages/hospitals/HospitalDashboard.jsx",
+      "additions": [
+        "Add 'Incoming Blood Requests' section",
+        "Display pending requests where donorHospitalId matches current hospital",
+        "Show: requesting hospital name, blood type, units, urgency",
+        "Add 'Approve' and 'Reject' buttons",
+        "Call existing approve/reject endpoints on button click"
+      ]
+    }
+  ],
+
+  "required_data_structure": {
+    "request_payload": {
+      "hospitalId": 1,
+      "bloodType": "O-",
+      "unitsNeeded": 5,
+      "urgency": "critical"
+    },
+    "response_payload": {
+      "success": true,
+      "bloodRequest": {
+        "id": "BR-1738157234567",
+        "requestingHospitalId": 1,
+        "donorHospitalId": 2,
+        "bloodType": "O-",
+        "unitsRequested": 5,
+        "urgency": "critical",
+        "status": "pending",
+        "createdAt": "2026-01-29T10:30:00Z"
+      },
+      "nearestHospital": {
+        "id": 2,
+        "name": "Metro Medical Center",
+        "distance": 3.5,
+        "bloodAvailable": true
+      }
+    }
+  },
+
+  "algorithm_workflow": {
+    "input": {
+      "requesting_hospital": "Hospital object that needs blood",
+      "all_hospitals": "Array of all hospitals from hospitals.json",
+      "blood_type": "Required blood type",
+      "units_needed": "Amount of blood needed"
+    },
+    "process": [
+      {
+        "step": "Filter hospitals",
+        "code": "hospitals.filter(h => h.id !== requestingHospital.id && h.isAvailable !== false)"
+      },
+      {
+        "step": "Find nearest",
+        "code": "findNearestHospitalToHospital(hospitals, requestingHospital)"
+      },
+      {
+        "step": "Check blood availability",
+        "code": "nearestHospital.bloodInventory.bloodTypes.find(bt => bt.type === bloodType && bt.liters >= unitsNeeded)"
+      },
+      {
+        "step": "If not available, find next nearest with blood",
+        "code": "Rank all hospitals by distance, filter by blood availability, select first"
+      },
+      {
+        "step": "Create blood request",
+        "code": "Generate new blood request object with status 'pending'"
+      },
+      {
+        "step": "Save to database",
+        "code": "Append to bloodRequests.json"
+      }
+    ],
+    "output": {
+      "blood_request_created": "New blood request record",
+      "nearest_hospital_found": "Hospital object with distance",
+      "alert_sent": "Notification ready for donor hospital dashboard"
+    }
+  },
+
+  "code_example": {
+    "backend_controller": "backend/src/controllers/bloodRequestController.js",
+    "code": "const alertNearestHospital = async (req, res) => {\n  const { hospitalId, bloodType, unitsNeeded, urgency } = req.body;\n  \n  // Get all hospitals\n  const hospitals = readHospitals();\n  const requestingHospital = hospitals.find(h => h.id === hospitalId);\n  \n  // Find nearest hospital\n  const nearestHospital = findNearestHospitalToHospital(hospitals, requestingHospital);\n  \n  // Check blood availability\n  const bloodAvailable = nearestHospital.bloodInventory.bloodTypes.find(\n    bt => bt.type === bloodType && bt.liters >= unitsNeeded\n  );\n  \n  // Create request\n  const bloodRequest = {\n    id: `BR-${Date.now()}`,\n    requestingHospitalId: hospitalId,\n    donorHospitalId: nearestHospital.id,\n    bloodType,\n    unitsRequested: unitsNeeded,\n    urgency: urgency || 'urgent',\n    status: 'pending',\n    createdAt: new Date().toISOString()\n  };\n  \n  // Save\n  const bloodRequests = readBloodRequests();\n  bloodRequests.push(bloodRequest);\n  writeBloodRequests(bloodRequests);\n  \n  res.json({ success: true, bloodRequest, nearestHospital });\n};"
+  },
+
+  "frontend_ui_flow": [
+    {
+      "screen": "Hospital Inventory Page",
+      "action": "Click 'Request Blood' button",
+      "modal": {
+        "title": "Request Blood from Nearest Hospital",
+        "fields": [
+          {
+            "name": "bloodType",
+            "type": "select",
+            "options": ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
+          },
+          {
+            "name": "unitsNeeded",
+            "type": "number",
+            "min": 1,
+            "placeholder": "Enter units needed"
+          },
+          {
+            "name": "urgency",
+            "type": "select",
+            "options": ["normal", "urgent", "critical"],
+            "default": "urgent"
+          }
+        ],
+        "buttons": ["Cancel", "Send Alert"]
+      }
+    },
+    {
+      "screen": "After Submit",
+      "success_message": "Blood request sent to [Hospital Name] - Distance: [X] km",
+      "redirect": "Hospital Dashboard to view pending requests"
+    },
+    {
+      "screen": "Donor Hospital Dashboard",
+      "notification": "New blood request from [Requesting Hospital]",
+      "display": {
+        "hospital": "Requesting hospital name",
+        "bloodType": "Blood type needed",
+        "units": "Units requested",
+        "urgency": "Badge showing urgency level",
+        "distance": "Distance between hospitals",
+        "actions": ["Approve", "Reject"]
+      }
+    }
+  ],
+
+  "existing_functions_to_use": {
+    "from_hospitalMatcher_js": [
+      "findNearestHospitalToHospital(hospitals, referenceHospital)"
+    ],
+    "from_distanceUtils_js": [
+      "calculateDistance(lat1, lon1, lat2, lon2)"
+    ],
+    "from_dataAccess_js": [
+      "readHospitals()",
+      "readBloodRequests()",
+      "writeBloodRequests(requests)"
+    ],
+    "existing_endpoints": [
+      "POST /api/blood-requests - Create blood request",
+      "GET /api/blood-requests - Get all requests",
+      "PATCH /api/blood-requests/:id/approve - Approve request",
+      "PATCH /api/blood-requests/:id/reject - Reject request"
+    ]
+  },
+
+  "testing_checklist": [
+    "✓ Test finding nearest hospital when multiple hospitals exist",
+    "✓ Test when nearest hospital doesn't have required blood type",
+    "✓ Test when nearest hospital has insufficient units",
+    "✓ Test blood request creation and storage in JSON",
+    "✓ Test UI displays correct nearest hospital information",
+    "✓ Test donor hospital sees incoming request in dashboard",
+    "✓ Test approve/reject functionality updates request status",
+    "✓ Test edge case: only one hospital in system",
+    "✓ Test edge case: requesting hospital is the only one with blood"
+  ],
+
+  "optional_enhancements": [
+    {
+      "feature": "Multi-Hospital Alert",
+      "description": "If nearest hospital rejects, automatically alert next nearest hospital",
+      "implementation": "On reject, find next nearest hospital and create new request"
+    },
+    {
+      "feature": "Broadcast Mode",
+      "description": "Send alert to top 3 nearest hospitals simultaneously",
+      "implementation": "Create multiple blood requests, first to approve wins"
+    },
+    {
+      "feature": "Blood Availability Filter",
+      "description": "Only alert hospitals that actually have the required blood",
+      "implementation": "Filter hospitals by blood inventory before finding nearest"
+    },
+    {
+      "feature": "Real-time Notifications",
+      "description": "Push notifications to donor hospital when request arrives",
+      "implementation": "Add WebSocket or polling mechanism for instant alerts"
+    }
+  ]
+}
