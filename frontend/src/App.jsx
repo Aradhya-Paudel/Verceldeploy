@@ -60,8 +60,8 @@ const router = createBrowserRouter([
   },
 ]);
 
-function Amcon() {
+function Bachaoo() {
   return <RouterProvider router={router} />;
 }
 
-export default Amcon;
+export default Bachaoo;

@@ -225,7 +225,7 @@ function HospitalInventory() {
                 <span className="material-symbols-outlined">menu</span>
               </button>
               <h2 className="text-primary text-base sm:text-lg font-bold truncate">
-                Amcon
+                Bachaoo
               </h2>
             </div>
             <div className="flex items-center gap-4">

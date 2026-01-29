@@ -106,7 +106,7 @@ function Login() {
             <img src="../public/logo.webp" className=" rounded-xl" alt="" />
           </div>
           <h2 className="text-primary text-base sm:text-lg md:text-xl font-bold leading-tight tracking-tight truncate">
-            Amcon
+            Bachaoo
           </h2>
         </div>
       </header>
@@ -115,9 +115,8 @@ function Login() {
           <div className="p-5 sm:p-6 md:p-8">
             <div className="text-center mb-6 sm:mb-8">
               <h1 className="text-primary text-xl sm:text-5xl font-bold leading-tight mb-2">
-                Amcon Login
+                Bachaoo Login
               </h1>
-              
             </div>
             <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit}>
               {/* Error Message */}
@@ -219,7 +218,7 @@ function Login() {
       </main>
       <footer className="py-4 sm:py-6 px-4 sm:px-10 flex justify-center items-center text-[10px] sm:text-xs text-gray-400">
         <div className="flex items-center gap-2 sm:gap-4 text-center">
-          <span>&copy; {currentDate} Amcon</span>
+          <span>&copy; {currentDate} Bachaoo</span>
         </div>
       </footer>
     </div>
