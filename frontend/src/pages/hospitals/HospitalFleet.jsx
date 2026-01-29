@@ -482,7 +482,7 @@ function HospitalFleet() {
 
               {/* Blood Alerts Section - from Nearest Hospitals (Najik hospitalharu bata blood alerts section) */}
               <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-gradient-to-r from-red-600 to-red-500 text-white">
+                <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-linear-to-r from-red-600 to-red-500 text-white">
                   <div>
                     <h3 className="font-bold text-lg sm:text-xl flex items-center gap-2">
                       <span className="material-symbols-outlined">
