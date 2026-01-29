@@ -13,11 +13,11 @@
       "ambulanceCount": 9,
       "bedsAvailable": 50,
       "bloodInventory": {
-        "total": 6,
+        "total": 7,
         "bloodTypes": [
           {
             "type": "A+",
-            "liters": 3
+            "liters": 4
           },
           {
             "type": "A-",
@@ -79,7 +79,68 @@
         "Emergency"
       ],
       "isAvailable": true,
-      "bloodAlerts": []
+      "bloodAlerts": [
+        {
+          "id": "BA-1706500000001",
+          "requestingHospitalId": 2,
+          "requestingHospitalName": "Manipal Teaching Hospital",
+          "requestingHospitalPhone": "+977-61-526416",
+          "requestingHospitalAddress": "Phulbari, Pokhara-11, Kaski, Nepal",
+          "bloodType": "A+",
+          "unitsRequested": 3,
+          "urgency": "critical",
+          "status": "rejected",
+          "distance": 2.5,
+          "casualtyDetails": {
+            "name": "Ram Bahadur",
+            "age": 45,
+            "injuryType": "Severe Trauma"
+          },
+          "createdAt": "2026-01-29T08:55:00.000Z",
+          "respondedAt": "2026-01-29T03:21:24.629Z",
+          "responseReason": "No reason provided"
+        },
+        {
+          "id": "BA-1706500000002",
+          "requestingHospitalId": 3,
+          "requestingHospitalName": "Gandaki Medical College",
+          "requestingHospitalPhone": "+977-61-538595",
+          "requestingHospitalAddress": "Lekhnath, Pokhara",
+          "bloodType": "O-",
+          "unitsRequested": 2,
+          "urgency": "urgent",
+          "status": "pending",
+          "distance": 4.1,
+          "casualtyDetails": {
+            "name": "Sita Sharma",
+            "age": 28,
+            "injuryType": "C-Section Complication"
+          },
+          "createdAt": "2026-01-29T08:30:00.000Z",
+          "respondedAt": null,
+          "responseReason": null
+        },
+        {
+          "id": "BA-1706500000003",
+          "requestingHospitalId": 4,
+          "requestingHospitalName": "Fishtail Hospital",
+          "requestingHospitalPhone": "+977-61-465068",
+          "requestingHospitalAddress": "Gairapatan, Pokhara",
+          "bloodType": "B+",
+          "unitsRequested": 1,
+          "urgency": "urgent",
+          "status": "pending",
+          "distance": 1.8,
+          "casualtyDetails": {
+            "name": "Unknown Patient",
+            "age": 30,
+            "injuryType": "Vehicle Accident"
+          },
+          "createdAt": "2026-01-29T09:00:00.000Z",
+          "respondedAt": null,
+          "responseReason": null
+        }
+      ]
     },
     {
       "id": 2,
